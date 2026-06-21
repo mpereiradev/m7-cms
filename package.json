@@ -1,0 +1,20 @@
+{
+  "name": "m7-cms",
+  "version": "1.0.0",
+  "description": "Painel CMS multi sites para clientes M7",
+  "keywords": [
+    "M7",
+    "CMS",
+    "M7 Dev"
+  ],
+  "author": "M7 Dev",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.6.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module"
+}
