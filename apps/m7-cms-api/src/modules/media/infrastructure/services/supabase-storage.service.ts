@@ -9,13 +9,16 @@ import type { IStoragePort } from '../../application/ports/i-storage.port.js';
 @Injectable()
 export class SupabaseStorageService implements IStoragePort {
   private readonly logger = new Logger(SupabaseStorageService.name);
-  private readonly supabase: SupabaseClient;
+  private _supabase: SupabaseClient | null = null;
 
-  constructor() {
-    this.supabase = createClient(
-      process.env.SUPABASE_URL ?? '',
-      process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-    );
+  private get supabase(): SupabaseClient {
+    if (!this._supabase) {
+      this._supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      );
+    }
+    return this._supabase;
   }
 
   private bucketName(tenantId: string): string {
