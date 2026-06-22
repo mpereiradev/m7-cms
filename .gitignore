@@ -24,4 +24,4 @@ node_modules
 Thumbs.db
 
 # TypeScript incremental
-*.tsbuildinfo
+*.tsbuildinfo.claude/worktrees/

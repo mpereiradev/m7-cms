@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { TenantSelector } from "@/components/tenant-selector/tenant-selector";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,8 +34,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          {children}
-          <Toaster richColors position="top-right" />
+          <AuthProvider>
+            {children}
+            <TenantSelector />
+            <Toaster richColors position="top-right" />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

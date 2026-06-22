@@ -1,4 +1,11 @@
-import { pgTable, uuid, varchar, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  boolean,
+} from 'drizzle-orm/pg-core';
 import { tenants } from './tenants.schema.js';
 
 export const contactFormSubmissions = pgTable('contact_form_submissions', {
@@ -10,5 +17,6 @@ export const contactFormSubmissions = pgTable('contact_form_submissions', {
   email: varchar('email', { length: 255 }).notNull(),
   subject: varchar('subject', { length: 500 }),
   message: text('message').notNull(),
+  processed: boolean('processed').default(false).notNull(),
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
 });

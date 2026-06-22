@@ -32,8 +32,11 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${session.access_token}`);
   }
 
-  // Tenant ID from session user metadata or localStorage fallback
+  // Tenant ID: cookie (set by AuthProvider) > user metadata > localStorage fallback
   const tenantId =
+    (typeof document !== "undefined"
+      ? document.cookie.match(/(?:^|;\s*)m7_tenant_id=([^;]*)/)?.[1]
+      : null) ??
     session?.user?.user_metadata?.tenant_id ??
     (typeof window !== "undefined"
       ? localStorage.getItem("tenant_id")

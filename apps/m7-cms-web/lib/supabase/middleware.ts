@@ -1,6 +1,23 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+/** Routes that don't require authentication */
+const PUBLIC_ROUTES = ["/login", "/forgot-password", "/auth"];
+
+/** Routes that don't require a tenant to be selected */
+const TENANT_EXEMPT_ROUTES = [
+  ...PUBLIC_ROUTES,
+  "/select-tenant",
+];
+
+function isPublicRoute(pathname: string): boolean {
+  return PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
+}
+
+function isTenantExemptRoute(pathname: string): boolean {
+  return TENANT_EXEMPT_ROUTES.some((route) => pathname.startsWith(route));
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -8,7 +25,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -37,16 +54,32 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/forgot-password") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // No user, redirect to login page
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Unauthenticated users are redirected to /login (except public routes)
+  if (!user && !isPublicRoute(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // 2. Authenticated users visiting /login are redirected to /dashboard
+  if (user && pathname === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // 3. Authenticated users without a tenant cookie are redirected to /select-tenant
+  //    (except tenant-exempt routes). The AuthProvider + TenantSelector handle this
+  //    on the client side, but the middleware provides a server-side fallback.
+  if (user && !isTenantExemptRoute(pathname)) {
+    const tenantId = request.cookies.get("m7_tenant_id")?.value;
+    if (!tenantId) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/select-tenant";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;
