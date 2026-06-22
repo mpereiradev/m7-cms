@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "dashboard": "Painel",
+    "pages": "Paginas",
+    "posts": "Posts",
+    "categories": "Categorias",
+    "tags": "Tags",
+    "media": "Midia",
+    "galleries": "Galerias",
+    "social": "Social",
+    "banners": "Banners",
+    "stores": "Lojas",
+    "contacts": "Contatos",
+    "users": "Usuarios",
+    "settings": "Configuracoes"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "loading": "Carregando...",
+    "noResults": "Nenhum resultado encontrado",
+    "confirm": "Confirmar",
+    "back": "Voltar"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPassword": "Redefinir senha"
+  }
+}

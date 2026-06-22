@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "pages": "Pages",
+    "posts": "Posts",
+    "categories": "Categories",
+    "tags": "Tags",
+    "media": "Media",
+    "galleries": "Galleries",
+    "social": "Social",
+    "banners": "Banners",
+    "stores": "Stores",
+    "contacts": "Contacts",
+    "users": "Users",
+    "settings": "Settings"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password"
+  }
+}
