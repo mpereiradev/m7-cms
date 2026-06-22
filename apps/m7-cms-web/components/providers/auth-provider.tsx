@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     removeTenantIdCookie();
     setUser(null);
     setTenantIdState(null);
-    router.push("/login");
+    router.push("/logout");
   }, [supabase.auth, router]);
 
   const setTenantId = useCallback((id: string) => {

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 /** Routes that don't require authentication */
-const PUBLIC_ROUTES = ["/login", "/forgot-password", "/auth"];
+const PUBLIC_ROUTES = ["/login", "/forgot-password", "/logout", "/auth"];
 
 /** Routes that don't require a tenant to be selected */
 const TENANT_EXEMPT_ROUTES = [
