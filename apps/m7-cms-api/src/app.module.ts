@@ -13,6 +13,7 @@ import { BannersModule } from './modules/banners/infrastructure/banners.module.j
 import { StoresModule } from './modules/stores/infrastructure/stores.module.js';
 import { ContactFormModule } from './modules/contact-form/infrastructure/contact-form.module.js';
 import { SettingsModule } from './modules/settings/infrastructure/settings.module.js';
+import { DashboardModule } from './modules/dashboard/infrastructure/dashboard.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SettingsModule } from './modules/settings/infrastructure/settings.modul
     StoresModule,
     ContactFormModule,
     SettingsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

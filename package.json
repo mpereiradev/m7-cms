@@ -9,6 +9,12 @@
   ],
   "author": "M7 Dev",
   "license": "ISC",
+  "scripts": {
+    "start:web": "pnpm --filter m7-cms-web dev",
+    "start:api": "pnpm --filter m7-cms-api start:dev",
+    "dev": "pnpm --filter m7-cms-web --filter m7-cms-api --parallel dev",
+    "start:all": "pnpm --filter m7-cms-web --filter m7-cms-api --parallel start"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
