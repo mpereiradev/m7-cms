@@ -5,7 +5,10 @@ import jwksRsa from 'jwks-rsa';
 import type { JwtPayload } from '../../application/use-cases/validate-jwt.use-case.js';
 
 @Injectable()
-export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'supabase-jwt') {
+export class SupabaseJwtStrategy extends PassportStrategy(
+  Strategy,
+  'supabase-jwt',
+) {
   constructor() {
     const jwksUrl = process.env.SUPABASE_JWKS_URL;
     if (!jwksUrl) {
@@ -20,7 +23,7 @@ export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'supabase-jw
         jwksRequestsPerMinute: 10,
         jwksUri: jwksUrl,
       }),
-      algorithms: ['RS256'],
+      algorithms: ['ES256', 'RS256'],
     });
   }
 
