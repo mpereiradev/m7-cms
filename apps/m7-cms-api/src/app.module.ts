@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './modules/auth/infrastructure/auth.module.js';
@@ -17,6 +18,7 @@ import { DashboardModule } from './modules/dashboard/infrastructure/dashboard.mo
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     TenantsModule,
     UsersModule,

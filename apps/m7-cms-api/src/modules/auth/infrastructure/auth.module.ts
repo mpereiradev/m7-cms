@@ -18,6 +18,7 @@ import { SupabaseJwtStrategy } from './strategies/supabase-jwt.strategy.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RolesGuard } from './guards/roles.guard.js';
 import { PreviewTokenGuard } from './guards/preview-token.guard.js';
+import { JwtOnlyGuard } from './guards/jwt-only.guard.js';
 import { PreviewTokenService } from './services/preview-token.service.js';
 import { AuthDrizzleRepository } from './services/auth-drizzle.repository.js';
 import { AuthController } from './controllers/auth.controller.js';
@@ -46,12 +47,14 @@ import { AuthController } from './controllers/auth.controller.js';
 
     // Guards (provided so they can be injected)
     JwtAuthGuard,
+    JwtOnlyGuard,
     RolesGuard,
     PreviewTokenGuard,
   ],
   exports: [
     // Guards
     JwtAuthGuard,
+    JwtOnlyGuard,
     RolesGuard,
     PreviewTokenGuard,
 
@@ -73,3 +76,4 @@ export { RolesGuard } from './guards/roles.guard.js';
 export { PreviewTokenGuard } from './guards/preview-token.guard.js';
 export { Roles, ROLES_KEY } from './decorators/roles.decorator.js';
 export { CurrentUser } from './decorators/current-user.decorator.js';
+export { JwtOnlyGuard } from './guards/jwt-only.guard.js';

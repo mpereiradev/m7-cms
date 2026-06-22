@@ -15,10 +15,11 @@ import { RemoveUserUseCase } from '../application/use-cases/remove-user.use-case
 import { DrizzleUserRepository } from './repositories/drizzle-user.repository.js';
 import { EmailService } from './services/email.service.js';
 import { UsersController } from './controllers/users.controller.js';
+import { MeController } from './controllers/me.controller.js';
 
 @Module({
   imports: [AuthModule],
-  controllers: [UsersController],
+  controllers: [MeController, UsersController],
   providers: [
     // Port implementations
     {
