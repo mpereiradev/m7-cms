@@ -5,6 +5,7 @@ export const STORE_REPOSITORY = Symbol('STORE_REPOSITORY');
 export interface CreateStoreData {
   tenantId: string;
   slug: string;
+  mapUrl?: string | null;
   translations: {
     languageCode: string;
     name: string;
@@ -18,6 +19,7 @@ export interface CreateStoreData {
 
 export interface UpdateStoreData {
   slug?: string;
+  mapUrl?: string | null;
   translations?: {
     languageCode: string;
     name: string;

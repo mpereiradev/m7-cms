@@ -41,7 +41,7 @@ export type SocialPost = {
   url: string;
   platform: SocialPlatform;
   isActive: boolean;
-  sortOrder: number;
+  order: number;
   createdAt: string;
   updatedAt: string;
 };

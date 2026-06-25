@@ -97,9 +97,7 @@ export async function deleteMedia(id: string): Promise<void> {
   return apiRequest<void>(`/media/${id}`, { method: "DELETE" });
 }
 
-/**
- * Get a signed URL for a private media file.
- */
-export async function getSignedUrl(id: string): Promise<{ url: string }> {
-  return apiRequest<{ url: string }>(`/media/${id}/signed-url`);
+export async function getSignedUrl(id: string): Promise<{ signedUrl: string }> {
+  const res = await apiRequest<{ data: { signedUrl: string } }>(`/media/${id}/signed-url`);
+  return res.data;
 }

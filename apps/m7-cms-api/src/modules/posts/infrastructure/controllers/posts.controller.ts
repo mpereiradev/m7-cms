@@ -77,7 +77,10 @@ export class PostsController {
     const post = await this.createPostUseCase.execute({
       tenantId: user.tenantId,
       slug: dto.slug,
+      status: dto.status,
+      publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
       authorId: user.userId,
+      coverMediaId: dto.coverMediaId,
       categoryIds: dto.categoryIds,
       tagIds: dto.tagIds,
       translations: dto.translations,

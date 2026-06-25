@@ -8,6 +8,34 @@
       "when": 1782084531524,
       "tag": "0000_premium_switch",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782144320264,
+      "tag": "0001_nappy_peter_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782161237592,
+      "tag": "0002_fuzzy_xavin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782183479226,
+      "tag": "0003_supreme_shinobi_shaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782353599281,
+      "tag": "0004_silly_hawkeye",
+      "breakpoints": true
     }
   ]
 }

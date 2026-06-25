@@ -3,22 +3,23 @@ import { z } from "zod";
 export const postTranslationSchema = z.object({
   languageCode: z.string().min(1),
   title: z.string().min(1, "O titulo e obrigatorio"),
-  slug: z.string().min(1, "O slug e obrigatorio"),
-  excerpt: z.string().optional(),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
+  summary: z.string(),
+  content: z.unknown().optional(),
+  seoTitle: z.string(),
+  seoDescription: z.string(),
 });
 
 export const postFormSchema = z.object({
-  status: z.enum(["draft", "published", "scheduled"]),
-  publishedAt: z.string().optional(),
-  coverImageUrl: z.string().optional(),
+  slug: z.string().min(1, "O slug e obrigatorio"),
+  status: z.enum(["draft", "published"]),
+  publishedAt: z.string(),
+  coverMediaId: z.string(),
+  coverImageUrl: z.string(),
   categoryIds: z.array(z.string()),
   tagIds: z.array(z.string()),
-  body: z.unknown().optional(),
   translations: z.object({
     "pt-BR": postTranslationSchema,
-    en: postTranslationSchema.partial({ title: true, slug: true }),
+    en: postTranslationSchema.partial(),
   }),
 });
 
@@ -28,33 +29,35 @@ export type PostTranslation = {
   id: string;
   languageCode: string;
   title: string;
-  slug: string;
-  excerpt: string | null;
-  metaTitle: string | null;
-  metaDescription: string | null;
+  summary: string | null;
+  content: unknown;
+  seoTitle: string | null;
+  seoDescription: string | null;
 };
 
 export type Post = {
   id: string;
   tenantId: string;
-  authorId: string;
-  status: "draft" | "published" | "scheduled";
+  slug: string;
+  authorId: string | null;
+  status: "draft" | "published";
   publishedAt: string | null;
-  coverImageUrl: string | null;
-  body: Record<string, unknown> | null;
+  coverMediaId: string | null;
   createdAt: string;
   updatedAt: string;
   translations: PostTranslation[];
-  categories: { id: string; name: string }[];
-  tags: { id: string; name: string }[];
+  categoryIds: string[];
+  tagIds: string[];
 };
 
 export type PostListItem = {
   id: string;
-  status: "draft" | "published" | "scheduled";
+  slug: string;
+  status: "draft" | "published";
   publishedAt: string | null;
-  coverImageUrl: string | null;
+  coverMediaId: string | null;
   updatedAt: string;
   translations: PostTranslation[];
-  categories: { id: string; name: string }[];
+  categoryIds: string[];
+  tagIds: string[];
 };

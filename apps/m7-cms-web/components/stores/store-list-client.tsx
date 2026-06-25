@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -26,12 +26,20 @@ import {
 import { useStores, useDeleteStore } from "@/lib/hooks/use-stores";
 import type { Store } from "@/lib/api/stores.api";
 
+function getStoreName(store: Store, lang = "pt-BR"): string {
+  const t = store.translations.find((tr) => tr.languageCode === lang);
+  return t?.name ?? store.translations[0]?.name ?? "Sem nome";
+}
+
+function getStoreField(store: Store, field: "address" | "phone" | "email", lang = "pt-BR"): string | null {
+  const t = store.translations.find((tr) => tr.languageCode === lang);
+  return t?.[field] ?? store.translations[0]?.[field] ?? null;
+}
+
 export function StoreListClient() {
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Store | null>(null);
 
-  const { data, isLoading } = useStores({ page, perPage: 20, search });
+  const { data: stores, isLoading } = useStores();
   const deleteMutation = useDeleteStore();
 
   async function handleDelete() {
@@ -49,9 +57,7 @@ export function StoreListClient() {
     );
   }
 
-  const stores = data?.data ?? [];
-  const total = data?.total ?? 0;
-  const totalPages = Math.ceil(total / 20);
+  const storeList = stores ?? [];
 
   return (
     <>
@@ -70,63 +76,63 @@ export function StoreListClient() {
         </Button>
       </div>
 
-      <div className="mb-4">
-        <Input
-          placeholder="Buscar lojas..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="max-w-sm"
-        />
-      </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Endereco</TableHead>
-              <TableHead>Telefone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[100px]">Acoes</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {stores.length === 0 ? (
+      {storeList.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground mb-4">
+              Nenhuma loja cadastrada.
+            </p>
+            <Button variant="outline" asChild>
+              <Link href="/stores/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Criar primeira loja
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  Nenhuma loja encontrada
-                </TableCell>
+                <TableHead>Nome</TableHead>
+                <TableHead>Endereco</TableHead>
+                <TableHead>Telefone</TableHead>
+                <TableHead>Idiomas</TableHead>
+                <TableHead className="w-[100px]">Acoes</TableHead>
               </TableRow>
-            ) : (
-              stores.map((store) => (
+            </TableHeader>
+            <TableBody>
+              {storeList.map((store) => (
                 <TableRow key={store.id}>
-                  <TableCell className="font-medium">{store.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      {store.city && store.state ? (
-                        <>
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span>
-                            {store.city}, {store.state}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">--</span>
-                      )}
-                    </div>
+                  <TableCell className="font-medium">
+                    {getStoreName(store)}
                   </TableCell>
                   <TableCell>
-                    {store.phone || (
+                    {getStoreField(store, "address") ? (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                        <span className="truncate max-w-xs">
+                          {getStoreField(store, "address")}
+                        </span>
+                      </div>
+                    ) : (
                       <span className="text-muted-foreground">--</span>
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={store.isActive ? "default" : "secondary"}>
-                      {store.isActive ? "Ativa" : "Inativa"}
-                    </Badge>
+                    {getStoreField(store, "phone") || (
+                      <span className="text-muted-foreground">--</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      {store.translations.map((t) => (
+                        <Badge key={t.languageCode} variant="outline" className="text-xs">
+                          {t.languageCode}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
@@ -145,34 +151,10 @@ export function StoreListClient() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Anterior
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Pagina {page} de {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Proxima
-          </Button>
-        </div>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
@@ -180,7 +162,8 @@ export function StoreListClient() {
           <DialogHeader>
             <DialogTitle>Confirmar exclusao</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir a loja &quot;{deleteTarget?.name}
+              Tem certeza que deseja excluir a loja &quot;
+              {deleteTarget ? getStoreName(deleteTarget) : ""}
               &quot;? Esta acao nao pode ser desfeita.
             </DialogDescription>
           </DialogHeader>

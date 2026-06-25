@@ -12,6 +12,8 @@ export class PostTranslationResponseDto {
   title!: string;
   summary!: string | null;
   content!: unknown;
+  seoTitle!: string | null;
+  seoDescription!: string | null;
 
   static fromEntity(entity: PostTranslationEntity): PostTranslationResponseDto {
     const dto = new PostTranslationResponseDto();
@@ -20,6 +22,8 @@ export class PostTranslationResponseDto {
     dto.title = entity.title;
     dto.summary = entity.summary;
     dto.content = entity.content;
+    dto.seoTitle = entity.seoTitle;
+    dto.seoDescription = entity.seoDescription;
     return dto;
   }
 }
@@ -31,6 +35,7 @@ export class PostResponseDto {
   status!: string;
   publishedAt!: string | null;
   authorId!: string | null;
+  coverMediaId!: string | null;
   createdAt!: string;
   updatedAt!: string;
   translations!: PostTranslationResponseDto[];
@@ -45,6 +50,7 @@ export class PostResponseDto {
     dto.status = entity.status;
     dto.publishedAt = entity.publishedAt?.toISOString() ?? null;
     dto.authorId = entity.authorId;
+    dto.coverMediaId = entity.coverMediaId;
     dto.createdAt = entity.createdAt.toISOString();
     dto.updatedAt = entity.updatedAt.toISOString();
     dto.translations = entity.translations.map(
@@ -103,6 +109,7 @@ export class CategoryResponseDto {
 export class TagResponseDto {
   id!: string;
   tenantId!: string;
+  name!: string;
   slug!: string;
   createdAt!: string;
   updatedAt!: string;
@@ -111,6 +118,7 @@ export class TagResponseDto {
     const dto = new TagResponseDto();
     dto.id = entity.id;
     dto.tenantId = entity.tenantId;
+    dto.name = entity.name;
     dto.slug = entity.slug;
     dto.createdAt = entity.createdAt.toISOString();
     dto.updatedAt = entity.updatedAt.toISOString();

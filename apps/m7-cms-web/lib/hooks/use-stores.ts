@@ -8,20 +8,12 @@ import {
   createStore,
   updateStore,
   deleteStore,
-  setStoreHours,
-  type CreateStorePayload,
-  type UpdateStorePayload,
-  type SetStoreHoursPayload,
 } from "@/lib/api/stores.api";
 
-export function useStores(params?: {
-  page?: number;
-  perPage?: number;
-  search?: string;
-}) {
+export function useStores() {
   return useQuery({
-    queryKey: ["stores", params],
-    queryFn: () => listStores(params),
+    queryKey: ["stores"],
+    queryFn: listStores,
   });
 }
 
@@ -37,7 +29,7 @@ export function useCreateStore() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateStorePayload) => createStore(data),
+    mutationFn: (data: Record<string, unknown>) => createStore(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stores"] });
       toast.success("Loja criada com sucesso");
@@ -52,7 +44,7 @@ export function useUpdateStore() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateStorePayload }) =>
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
       updateStore(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stores"] });
@@ -75,22 +67,6 @@ export function useDeleteStore() {
     },
     onError: (error: Error) => {
       toast.error(error.message || "Erro ao remover loja");
-    },
-  });
-}
-
-export function useSetStoreHours() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: SetStoreHoursPayload }) =>
-      setStoreHours(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["stores"] });
-      toast.success("Horarios atualizados com sucesso");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Erro ao atualizar horarios");
     },
   });
 }

@@ -61,6 +61,7 @@ export class StoresController {
     const store = await this.createStoreUseCase.execute({
       tenantId: user.tenantId,
       slug: dto.slug,
+      mapUrl: dto.mapUrl,
       translations: dto.translations,
     });
     return { data: StoreResponseDto.fromEntity(store) };

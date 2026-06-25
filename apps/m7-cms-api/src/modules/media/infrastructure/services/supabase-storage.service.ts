@@ -15,7 +15,7 @@ export class SupabaseStorageService implements IStoragePort {
     if (!this._supabase) {
       this._supabase = createClient(
         process.env.SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        process.env.SUPABASE_SECRET_KEY!,
       );
     }
     return this._supabase;

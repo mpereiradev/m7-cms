@@ -3,6 +3,8 @@ import {
   IsOptional,
   IsArray,
   IsUUID,
+  IsEnum,
+  IsDateString,
   ValidateNested,
   MaxLength,
 } from 'class-validator';
@@ -23,12 +25,37 @@ export class PostTranslationDto {
 
   @IsOptional()
   content?: unknown;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  seoTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  seoDescription?: string;
 }
 
 export class CreatePostDto {
   @IsString()
   @MaxLength(255)
   slug!: string;
+
+  @IsOptional()
+  @IsEnum(['draft', 'published'])
+  status?: string;
+
+  @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
+
+  @IsOptional()
+  @IsUUID()
+  coverMediaId?: string;
+
+  @IsOptional()
+  @IsString()
+  coverImageUrl?: string;
 
   @IsOptional()
   @IsArray()
@@ -51,6 +78,22 @@ export class UpdatePostDto {
   @IsString()
   @MaxLength(255)
   slug?: string;
+
+  @IsOptional()
+  @IsEnum(['draft', 'published'])
+  status?: string;
+
+  @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
+
+  @IsOptional()
+  @IsUUID()
+  coverMediaId?: string;
+
+  @IsOptional()
+  @IsString()
+  coverImageUrl?: string;
 
   @IsOptional()
   @IsArray()

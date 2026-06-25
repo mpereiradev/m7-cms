@@ -1,26 +1,23 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSetStoreHours } from "@/lib/hooks/use-stores";
-import {
-  storeHoursFormSchema,
-  type StoreHoursFormValues,
-} from "@/lib/schemas/store.schema";
-import type { StoreHours } from "@/lib/api/stores.api";
+import { setStoreHours, type StoreHour } from "@/lib/api/stores.api";
+import { useQueryClient } from "@tanstack/react-query";
 
-const DAY_LABELS = [
+const WEEKDAY_LABELS = [
   "Domingo",
   "Segunda-feira",
   "Terca-feira",
@@ -30,127 +27,163 @@ const DAY_LABELS = [
   "Sabado",
 ];
 
-function getDefaultHours(existingHours?: StoreHours[]): StoreHours[] {
-  return Array.from({ length: 7 }, (_, i) => {
-    const existing = existingHours?.find((h) => h.dayOfWeek === i);
-    return {
-      dayOfWeek: i,
-      isOpen: existing?.isOpen ?? (i >= 1 && i <= 5), // Mon-Fri open by default
-      openTime: existing?.openTime ?? "08:00",
-      closeTime: existing?.closeTime ?? "18:00",
-    };
-  });
-}
+type LocalHour = {
+  weekday: number;
+  openTime: string;
+  closeTime: string;
+};
 
 type StoreHoursManagerProps = {
   storeId: string;
-  hours?: StoreHours[];
+  hours: StoreHour[];
 };
 
 export function StoreHoursManager({ storeId, hours }: StoreHoursManagerProps) {
-  const setHours = useSetStoreHours();
+  const queryClient = useQueryClient();
+  const [localHours, setLocalHours] = useState<LocalHour[]>(
+    hours.map((h) => ({
+      weekday: h.weekday,
+      openTime: h.openTime.slice(0, 5),
+      closeTime: h.closeTime.slice(0, 5),
+    }))
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
-  const form = useForm<StoreHoursFormValues>({
-    resolver: zodResolver(storeHoursFormSchema),
-    defaultValues: {
-      hours: getDefaultHours(hours),
-    },
-  });
+  const usedWeekdays = new Set(localHours.map((h) => h.weekday));
 
-  async function onSubmit(values: StoreHoursFormValues) {
-    await setHours.mutateAsync({ id: storeId, data: values });
+  function addHour() {
+    const nextDay = Array.from({ length: 7 }, (_, i) => i).find(
+      (d) => !usedWeekdays.has(d)
+    );
+    if (nextDay === undefined) return;
+    setLocalHours((prev) => [
+      ...prev,
+      { weekday: nextDay, openTime: "08:00", closeTime: "18:00" },
+    ]);
+  }
+
+  function removeHour(index: number) {
+    setLocalHours((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateHour(index: number, field: keyof LocalHour, value: string | number) {
+    setLocalHours((prev) =>
+      prev.map((h, i) => (i === index ? { ...h, [field]: value } : h))
+    );
+  }
+
+  async function handleSave() {
+    setIsSaving(true);
+    try {
+      await setStoreHours(storeId, {
+        hours: localHours.map((h) => ({
+          weekday: h.weekday,
+          openTime: h.openTime,
+          closeTime: h.closeTime,
+        })),
+      });
+      queryClient.invalidateQueries({ queryKey: ["stores"] });
+      toast.success("Horarios salvos com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao salvar horarios", {
+        description:
+          error instanceof Error ? error.message : "Erro desconhecido",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Horarios de Funcionamento</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Horarios de atendimento</CardTitle>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addHour}
+          disabled={usedWeekdays.size >= 7}
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Adicionar dia
+        </Button>
       </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-3">
-              {DAY_LABELS.map((label, dayIndex) => (
-                <div
-                  key={dayIndex}
-                  className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 py-2 border-b last:border-b-0"
+      <CardContent className="space-y-3">
+        {localHours.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            Nenhum horario cadastrado. Clique em &quot;Adicionar dia&quot; para comecar.
+          </p>
+        ) : (
+          localHours
+            .sort((a, b) => a.weekday - b.weekday)
+            .map((hour, index) => (
+              <div
+                key={`${hour.weekday}-${index}`}
+                className="flex items-center gap-3"
+              >
+                <Select
+                  value={String(hour.weekday)}
+                  onValueChange={(val) =>
+                    updateHour(index, "weekday", parseInt(val))
+                  }
                 >
-                  <span className="text-sm font-medium min-w-[120px]">
-                    {label}
-                  </span>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {WEEKDAY_LABELS.map((label, day) => (
+                      <SelectItem
+                        key={day}
+                        value={String(day)}
+                        disabled={usedWeekdays.has(day) && day !== hour.weekday}
+                      >
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  <FormField
-                    control={form.control}
-                    name={`hours.${dayIndex}.isOpen`}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          Aberto
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
+                <Input
+                  type="time"
+                  value={hour.openTime}
+                  onChange={(e) => updateHour(index, "openTime", e.target.value)}
+                  className="w-[130px]"
+                />
 
-                  {form.watch(`hours.${dayIndex}.isOpen`) ? (
-                    <>
-                      <FormField
-                        control={form.control}
-                        name={`hours.${dayIndex}.openTime`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="time"
-                                className="w-[130px]"
-                                value={field.value ?? ""}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                <span className="text-muted-foreground text-sm">ate</span>
 
-                      <FormField
-                        control={form.control}
-                        name={`hours.${dayIndex}.closeTime`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="time"
-                                className="w-[130px]"
-                                value={field.value ?? ""}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </>
-                  ) : (
-                    <span className="col-span-2 text-sm text-muted-foreground">
-                      Fechado
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+                <Input
+                  type="time"
+                  value={hour.closeTime}
+                  onChange={(e) =>
+                    updateHour(index, "closeTime", e.target.value)
+                  }
+                  className="w-[130px]"
+                />
 
-            <div className="flex justify-end pt-4">
-              <Button type="submit" disabled={setHours.isPending}>
-                {setHours.isPending
-                  ? "Salvando..."
-                  : "Salvar Horarios"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeHour(index)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ))
+        )}
+
+        <div className="flex justify-end pt-2">
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Salvar horarios
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

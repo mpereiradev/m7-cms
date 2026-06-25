@@ -166,7 +166,7 @@ export function VideoListClient({ galleryId, basePath }: VideoListClientProps) {
 
   // Sync server data into local state for optimistic reordering
   if (data?.data && !listInitialized) {
-    setVideoList([...data.data].sort((a, b) => a.sortOrder - b.sortOrder));
+    setVideoList([...data.data].sort((a, b) => a.order - b.order));
     setListInitialized(true);
   }
 

@@ -19,7 +19,10 @@ export interface IPostRepository {
   create(data: {
     tenantId: string;
     slug: string;
+    status?: string;
+    publishedAt?: Date | null;
     authorId: string | null;
+    coverMediaId?: string | null;
     categoryIds?: string[];
     tagIds?: string[];
     translations: {
@@ -27,6 +30,8 @@ export interface IPostRepository {
       title: string;
       summary?: string | null;
       content?: unknown;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
     }[];
   }): Promise<PostEntity>;
   update(
@@ -36,6 +41,7 @@ export interface IPostRepository {
       slug?: string;
       status?: 'draft' | 'published';
       publishedAt?: Date | null;
+      coverMediaId?: string | null;
       categoryIds?: string[];
       tagIds?: string[];
       translations?: {
@@ -43,6 +49,8 @@ export interface IPostRepository {
         title: string;
         summary?: string | null;
         content?: unknown;
+        seoTitle?: string | null;
+        seoDescription?: string | null;
       }[];
     },
   ): Promise<PostEntity | null>;
@@ -65,6 +73,21 @@ export interface ICategoryRepository {
       description?: string | null;
     }[];
   }): Promise<CategoryEntity>;
+  update(
+    tenantId: string,
+    id: string,
+    data: {
+      slug?: string;
+      parentId?: string | null;
+      order?: number;
+      translations?: {
+        languageCode: string;
+        name: string;
+        description?: string | null;
+      }[];
+    },
+  ): Promise<CategoryEntity>;
+  delete(tenantId: string, id: string): Promise<void>;
 }
 
 export const TAG_REPOSITORY = Symbol('TAG_REPOSITORY');
@@ -72,5 +95,10 @@ export const TAG_REPOSITORY = Symbol('TAG_REPOSITORY');
 export interface ITagRepository {
   findById(tenantId: string, id: string): Promise<TagEntity | null>;
   findAll(tenantId: string): Promise<TagEntity[]>;
-  create(data: { tenantId: string; slug: string }): Promise<TagEntity>;
+  create(data: {
+    tenantId: string;
+    name: string;
+    slug: string;
+  }): Promise<TagEntity>;
+  delete(tenantId: string, id: string): Promise<void>;
 }

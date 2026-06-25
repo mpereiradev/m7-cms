@@ -7,6 +7,7 @@ import {
 
 export interface CreateTagInput {
   tenantId: string;
+  name: string;
   slug: string;
 }
 

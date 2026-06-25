@@ -58,6 +58,7 @@ export class StoreEntity {
   readonly id: string;
   readonly tenantId: string;
   readonly slug: string;
+  readonly mapUrl: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly translations: StoreTranslationValue[];
@@ -67,6 +68,7 @@ export class StoreEntity {
     id: string;
     tenantId: string;
     slug: string;
+    mapUrl?: string | null;
     createdAt: Date;
     updatedAt: Date;
     translations?: StoreTranslationValue[];
@@ -75,6 +77,7 @@ export class StoreEntity {
     this.id = props.id;
     this.tenantId = props.tenantId;
     this.slug = props.slug;
+    this.mapUrl = props.mapUrl ?? null;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
     this.translations = props.translations ?? [];

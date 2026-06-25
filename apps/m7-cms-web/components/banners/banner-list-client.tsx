@@ -97,11 +97,11 @@ export function BannerListClient() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">Imagem</TableHead>
                 <TableHead>Titulo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Inicio</TableHead>
                 <TableHead>Termino</TableHead>
+                <TableHead>Ordem</TableHead>
                 <TableHead className="text-right">Acoes</TableHead>
               </TableRow>
             </TableHeader>
@@ -110,21 +110,8 @@ export function BannerListClient() {
                 const status = getBannerStatus(banner);
                 return (
                   <TableRow key={banner.id}>
-                    <TableCell>
-                      {banner.imageUrl ? (
-                        <img
-                          src={banner.imageUrl}
-                          alt={banner.title}
-                          className="h-10 w-16 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="h-10 w-16 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                          Sem img
-                        </div>
-                      )}
-                    </TableCell>
                     <TableCell className="font-medium">
-                      {banner.title}
+                      {banner.title ?? "-"}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -135,10 +122,13 @@ export function BannerListClient() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(banner.startsAt)}
+                      {formatDate(banner.displayStart)}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(banner.endsAt)}
+                      {formatDate(banner.displayEnd)}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {banner.order}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -165,7 +155,6 @@ export function BannerListClient() {
         </Card>
       )}
 
-      {/* Delete confirmation */}
       <Dialog
         open={!!deleteTarget}
         onOpenChange={(open) => {

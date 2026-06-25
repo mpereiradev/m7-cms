@@ -1,0 +1,1 @@
+ALTER TABLE "contact_form_submissions" ADD COLUMN "processed" boolean DEFAULT false NOT NULL;

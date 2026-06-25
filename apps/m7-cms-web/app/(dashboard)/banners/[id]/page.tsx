@@ -54,14 +54,13 @@ export default function EditBannerPage({
       <BannerForm
         onSubmit={handleSubmit}
         defaultValues={{
-          title: banner.title,
-          imageUrl: banner.imageUrl,
+          title: banner.title ?? "",
+          mediaId: banner.mediaId ?? "",
           ctaLabel: banner.ctaLabel ?? "",
-          ctaUrl: banner.ctaUrl ?? "",
-          pageTarget: banner.pageTarget,
-          isActive: banner.isActive,
-          startsAt: banner.startsAt ?? "",
-          endsAt: banner.endsAt ?? "",
+          linkUrl: banner.linkUrl ?? "",
+          displayStart: banner.displayStart ?? "",
+          displayEnd: banner.displayEnd ?? "",
+          order: banner.order,
         }}
         isLoading={updateMutation.isPending}
         mode="edit"

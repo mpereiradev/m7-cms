@@ -46,38 +46,14 @@ export default function MediaLibraryPage() {
           }}
           className="max-w-sm"
         />
-        {data && (
+        {data?.data && (
           <span className="text-sm text-muted-foreground">
-            {data.meta.total} {data.meta.total === 1 ? "file" : "files"}
+            {data.data.length} {data.data.length === 1 ? "file" : "files"}
           </span>
         )}
       </div>
 
       <MediaGrid items={data?.data ?? []} isLoading={isLoading} />
-
-      {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {data.meta.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= data.meta.totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

@@ -8,7 +8,10 @@ import {
 export interface CreatePostInput {
   tenantId: string;
   slug: string;
+  status?: string;
+  publishedAt?: Date | null;
   authorId: string | null;
+  coverMediaId?: string | null;
   categoryIds?: string[];
   tagIds?: string[];
   translations: {
@@ -16,6 +19,8 @@ export interface CreatePostInput {
     title: string;
     summary?: string | null;
     content?: unknown;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
   }[];
 }
 

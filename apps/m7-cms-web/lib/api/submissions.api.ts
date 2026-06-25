@@ -44,11 +44,13 @@ export async function listSubmissions(params?: {
 }
 
 export async function getSubmission(id: string): Promise<Submission> {
-  return apiRequest<Submission>(`/contact-submissions/${id}`);
+  const res = await apiRequest<{ data: Submission }>(`/contact-submissions/${id}`);
+  return res.data;
 }
 
 export async function markProcessed(id: string): Promise<Submission> {
-  return apiRequest<Submission>(`/contact-submissions/${id}/process`, {
+  const res = await apiRequest<{ data: Submission }>(`/contact-submissions/${id}/process`, {
     method: "PATCH",
   });
+  return res.data;
 }

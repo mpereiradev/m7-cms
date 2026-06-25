@@ -6,13 +6,12 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-  type ListCategoriesParams,
 } from "@/lib/api/categories.api";
 
-export function useCategories(params?: ListCategoriesParams) {
+export function useCategories() {
   return useQuery({
-    queryKey: ["categories", params],
-    queryFn: () => listCategories(params),
+    queryKey: ["categories"],
+    queryFn: listCategories,
   });
 }
 

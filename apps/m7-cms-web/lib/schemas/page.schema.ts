@@ -3,17 +3,15 @@ import { z } from "zod";
 export const pageTranslationSchema = z.object({
   languageCode: z.string().min(1),
   title: z.string().min(1, "O titulo e obrigatorio"),
-  slug: z.string().min(1, "O slug e obrigatorio"),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
+  seoTitle: z.string(),
+  seoDescription: z.string(),
 });
 
 export const pageFormSchema = z.object({
-  isPublished: z.boolean(),
-  publishedAt: z.string().optional(),
+  slug: z.string().min(1, "O slug e obrigatorio"),
   translations: z.object({
     "pt-BR": pageTranslationSchema,
-    en: pageTranslationSchema.partial({ title: true, slug: true }),
+    en: pageTranslationSchema.partial(),
   }),
 });
 
@@ -23,9 +21,8 @@ export type PageTranslation = {
   id: string;
   languageCode: string;
   title: string;
-  slug: string;
-  metaTitle: string | null;
-  metaDescription: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
 };
 
 export type PageSection = {
@@ -38,7 +35,8 @@ export type PageSection = {
 export type Page = {
   id: string;
   tenantId: string;
-  isPublished: boolean;
+  slug: string;
+  status: "draft" | "published";
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -48,7 +46,8 @@ export type Page = {
 
 export type PageListItem = {
   id: string;
-  isPublished: boolean;
+  slug: string;
+  status: "draft" | "published";
   publishedAt: string | null;
   updatedAt: string;
   translations: PageTranslation[];

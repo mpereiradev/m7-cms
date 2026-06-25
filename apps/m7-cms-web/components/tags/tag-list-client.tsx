@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import type { Tag } from "@/lib/api/tags.api";
+import { SlugField } from "@/components/shared/slug-field";
 
 const tagFormSchema = z.object({
   name: z.string().min(1, "O nome e obrigatorio"),
@@ -141,32 +142,22 @@ export function TagListClient() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nome da tag" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug</FormLabel>
-                      <FormControl>
-                        <Input placeholder="nome-da-tag" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-1.5">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome da tag" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <SlugField form={form} sourceField="name" />
+                </div>
                 <div className="flex justify-end gap-2">
                   <Button
                     type="button"
@@ -197,7 +188,7 @@ export function TagListClient() {
       ) : (
         <DataTable
           columns={columns}
-          data={data?.data ?? []}
+          data={data ?? []}
           searchColumn="name"
           searchPlaceholder="Buscar tags..."
         />

@@ -52,11 +52,11 @@ export function PageListClient() {
       },
     },
     {
-      accessorKey: "isPublished",
+      accessorKey: "status",
       header: "Status",
       cell: ({ row }) => (
-        <Badge variant={row.original.isPublished ? "default" : "secondary"}>
-          {row.original.isPublished ? "Publicado" : "Rascunho"}
+        <Badge variant={row.original.status === "published" ? "default" : "secondary"}>
+          {row.original.status === "published" ? "Publicado" : "Rascunho"}
         </Badge>
       ),
     },

@@ -5,6 +5,8 @@ export class PostTranslationEntity {
   readonly title: string;
   readonly summary: string | null;
   readonly content: unknown;
+  readonly seoTitle: string | null;
+  readonly seoDescription: string | null;
 
   constructor(props: {
     id: string;
@@ -13,6 +15,8 @@ export class PostTranslationEntity {
     title: string;
     summary: string | null;
     content: unknown;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
   }) {
     this.id = props.id;
     this.postId = props.postId;
@@ -20,6 +24,8 @@ export class PostTranslationEntity {
     this.title = props.title;
     this.summary = props.summary;
     this.content = props.content;
+    this.seoTitle = props.seoTitle ?? null;
+    this.seoDescription = props.seoDescription ?? null;
   }
 }
 
@@ -32,6 +38,7 @@ export class PostEntity {
   readonly status: PostStatus;
   readonly publishedAt: Date | null;
   readonly authorId: string | null;
+  readonly coverMediaId: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly translations: PostTranslationEntity[];
@@ -45,6 +52,7 @@ export class PostEntity {
     status: PostStatus;
     publishedAt: Date | null;
     authorId: string | null;
+    coverMediaId?: string | null;
     createdAt: Date;
     updatedAt: Date;
     translations?: PostTranslationEntity[];
@@ -57,6 +65,7 @@ export class PostEntity {
     this.status = props.status;
     this.publishedAt = props.publishedAt;
     this.authorId = props.authorId;
+    this.coverMediaId = props.coverMediaId ?? null;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
     this.translations = props.translations ?? [];
@@ -129,6 +138,7 @@ export class CategoryEntity {
 export class TagEntity {
   readonly id: string;
   readonly tenantId: string;
+  readonly name: string;
   readonly slug: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
@@ -136,12 +146,14 @@ export class TagEntity {
   constructor(props: {
     id: string;
     tenantId: string;
+    name: string;
     slug: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
     this.id = props.id;
     this.tenantId = props.tenantId;
+    this.name = props.name;
     this.slug = props.slug;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;

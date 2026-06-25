@@ -13,10 +13,10 @@ import {
 } from "@/lib/schemas/page.schema";
 import { useCreatePage, useUpdatePage } from "@/lib/hooks/use-pages";
 import { LangTabs } from "@/components/shared/lang-tabs";
+import { SlugField } from "@/components/shared/slug-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -24,7 +24,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -49,22 +48,19 @@ export function PageForm({ page }: PageFormProps) {
   const form = useForm<PageFormValues>({
     resolver: zodResolver(pageFormSchema),
     defaultValues: {
-      isPublished: page?.isPublished ?? false,
-      publishedAt: page?.publishedAt ?? "",
+      slug: page?.slug ?? "",
       translations: {
         "pt-BR": {
           languageCode: "pt-BR",
           title: ptBr?.title ?? "",
-          slug: ptBr?.slug ?? "",
-          metaTitle: ptBr?.metaTitle ?? "",
-          metaDescription: ptBr?.metaDescription ?? "",
+          seoTitle: ptBr?.seoTitle ?? "",
+          seoDescription: ptBr?.seoDescription ?? "",
         },
         en: {
           languageCode: "en",
           title: en?.title ?? "",
-          slug: en?.slug ?? "",
-          metaTitle: en?.metaTitle ?? "",
-          metaDescription: en?.metaDescription ?? "",
+          seoTitle: en?.seoTitle ?? "",
+          seoDescription: en?.seoDescription ?? "",
         },
       },
     },
@@ -72,14 +68,10 @@ export function PageForm({ page }: PageFormProps) {
 
   async function onSubmit(values: PageFormValues) {
     const translations = Object.values(values.translations).filter(
-      (t) => t.title && t.slug
+      (t) => t.title
     );
 
-    const payload = {
-      isPublished: values.isPublished,
-      publishedAt: values.publishedAt || null,
-      translations,
-    };
+    const payload = { slug: values.slug, translations };
 
     try {
       if (isEditing) {
@@ -114,42 +106,30 @@ export function PageForm({ page }: PageFormProps) {
             <LangTabs>
               {(lang) => (
                 <div className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name={`translations.${lang}.title`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Titulo {lang === "en" ? "(English)" : "(Portugues)"}
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Titulo da pagina" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-1.5">
+                    <FormField
+                      control={form.control}
+                      name={`translations.${lang}.title`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Titulo {lang === "en" ? "(English)" : "(Portugues)"} {lang === "pt-BR" && "*"}
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Titulo da pagina" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {lang === "pt-BR" && (
+                      <SlugField form={form} sourceField="translations.pt-BR.title" />
                     )}
-                  />
+                  </div>
 
                   <FormField
                     control={form.control}
-                    name={`translations.${lang}.slug`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Slug</FormLabel>
-                        <FormControl>
-                          <Input placeholder="titulo-da-pagina" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          URL amigavel. Ex: /paginas/titulo-da-pagina
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name={`translations.${lang}.metaTitle`}
+                    name={`translations.${lang}.seoTitle`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Meta Title (SEO)</FormLabel>
@@ -163,7 +143,7 @@ export function PageForm({ page }: PageFormProps) {
 
                   <FormField
                     control={form.control}
-                    name={`translations.${lang}.metaDescription`}
+                    name={`translations.${lang}.seoDescription`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Meta Description (SEO)</FormLabel>
@@ -181,51 +161,6 @@ export function PageForm({ page }: PageFormProps) {
                 </div>
               )}
             </LangTabs>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Publicacao</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="isPublished"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Publicar pagina</FormLabel>
-                    <FormDescription>
-                      Marque para tornar a pagina visivel no site
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="publishedAt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Data de publicacao</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Deixe vazio para publicar imediatamente
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </CardContent>
         </Card>
 

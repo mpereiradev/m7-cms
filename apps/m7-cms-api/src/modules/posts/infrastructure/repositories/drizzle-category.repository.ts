@@ -101,4 +101,52 @@ export class DrizzleCategoryRepository implements ICategoryRepository {
 
     return this.findById(data.tenantId, row.id) as Promise<CategoryEntity>;
   }
+
+  async update(
+    tenantId: string,
+    id: string,
+    data: {
+      slug?: string;
+      parentId?: string | null;
+      order?: number;
+      translations?: {
+        languageCode: string;
+        name: string;
+        description?: string | null;
+      }[];
+    },
+  ): Promise<CategoryEntity> {
+    const updateData: Record<string, unknown> = { updatedAt: new Date() };
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.parentId !== undefined) updateData.parentId = data.parentId;
+    if (data.order !== undefined) updateData.order = data.order;
+
+    await db
+      .update(categories)
+      .set(updateData)
+      .where(and(eq(categories.tenantId, tenantId), eq(categories.id, id)));
+
+    if (data.translations && data.translations.length > 0) {
+      await db
+        .delete(categoryTranslations)
+        .where(eq(categoryTranslations.categoryId, id));
+
+      await db.insert(categoryTranslations).values(
+        data.translations.map((t) => ({
+          categoryId: id,
+          languageCode: t.languageCode,
+          name: t.name,
+          description: t.description ?? null,
+        })),
+      );
+    }
+
+    return this.findById(tenantId, id) as Promise<CategoryEntity>;
+  }
+
+  async delete(tenantId: string, id: string): Promise<void> {
+    await db
+      .delete(categories)
+      .where(and(eq(categories.tenantId, tenantId), eq(categories.id, id)));
+  }
 }

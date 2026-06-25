@@ -30,17 +30,16 @@ export function MediaPicker({
   onOpenChange,
   onSelect,
   accept,
-  title = "Select media",
+  title = "Selecionar midia",
 }: MediaPickerProps) {
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
-  const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("browse");
 
   const mimeTypeFilter = accept?.startsWith("image/") ? "image" : undefined;
 
   const { data, isLoading } = useMedia({
-    page,
-    perPage: 20,
+    perPage: 30,
     search: search || undefined,
     mimeType: mimeTypeFilter,
   });
@@ -62,30 +61,31 @@ export function MediaPicker({
     onOpenChange(false);
   };
 
+  const handleUploadComplete = () => {
+    setActiveTab("browse");
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Browse existing files or upload a new one.
+            Navegue pelos arquivos existentes ou envie um novo.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="browse">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="browse">Browse</TabsTrigger>
-            <TabsTrigger value="upload">Upload</TabsTrigger>
+            <TabsTrigger value="browse">Biblioteca</TabsTrigger>
+            <TabsTrigger value="upload">Enviar novo</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-4">
             <Input
-              placeholder="Search files..."
+              placeholder="Buscar arquivos..."
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <MediaGrid
               items={data?.data ?? []}
@@ -94,42 +94,27 @@ export function MediaPicker({
               onSelect={setSelectedItem}
               selectedId={selectedItem?.id}
             />
-            {data && data.meta.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {page} of {data.meta.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page >= data.meta.totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                </Button>
-              </div>
+            {data?.data && (
+              <p className="text-center text-sm text-muted-foreground">
+                {data.data.length} {data.data.length === 1 ? "arquivo" : "arquivos"}
+              </p>
             )}
           </TabsContent>
 
           <TabsContent value="upload">
-            <MediaUploader accept={accept} />
+            <MediaUploader
+              accept={accept}
+              onUploadComplete={handleUploadComplete}
+            />
           </TabsContent>
         </Tabs>
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            Cancelar
           </Button>
           <Button onClick={handleConfirm} disabled={!selectedItem}>
-            Select
+            Selecionar
           </Button>
         </DialogFooter>
       </DialogContent>

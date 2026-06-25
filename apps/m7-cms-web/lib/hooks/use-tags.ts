@@ -1,17 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  listTags,
-  createTag,
-  deleteTag,
-  type ListTagsParams,
-} from "@/lib/api/tags.api";
+import { listTags, createTag, deleteTag } from "@/lib/api/tags.api";
 
-export function useTags(params?: ListTagsParams) {
+export function useTags() {
   return useQuery({
-    queryKey: ["tags", params],
-    queryFn: () => listTags(params),
+    queryKey: ["tags"],
+    queryFn: listTags,
   });
 }
 

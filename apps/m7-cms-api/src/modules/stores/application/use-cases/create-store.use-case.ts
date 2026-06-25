@@ -9,6 +9,7 @@ import {
 export interface CreateStoreInput {
   tenantId: string;
   slug: string;
+  mapUrl?: string | null;
   translations: {
     languageCode: string;
     name: string;
@@ -31,6 +32,7 @@ export class CreateStoreUseCase {
     const data: CreateStoreData = {
       tenantId: input.tenantId,
       slug: input.slug,
+      mapUrl: input.mapUrl,
       translations: input.translations,
     };
     return this.storeRepository.create(data);

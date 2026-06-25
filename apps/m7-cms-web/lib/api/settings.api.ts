@@ -32,24 +32,27 @@ export type BatchUpdatePayload = {
 // --- API functions ---
 
 export async function getSettings(): Promise<Setting[]> {
-  return apiRequest<Setting[]>("/settings");
+  const res = await apiRequest<{ data: Setting[] }>("/settings");
+  return res.data;
 }
 
 export async function updateSetting(
   key: string,
   data: UpdateSettingPayload
 ): Promise<Setting> {
-  return apiRequest<Setting>(`/settings/${key}`, {
+  const res = await apiRequest<{ data: Setting }>(`/settings/${key}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+  return res.data;
 }
 
 export async function batchUpdateSettings(
   data: BatchUpdatePayload
 ): Promise<Setting[]> {
-  return apiRequest<Setting[]>("/settings/batch", {
+  const res = await apiRequest<{ data: Setting[] }>("/settings/batch", {
     method: "PUT",
     body: JSON.stringify(data),
   });
+  return res.data;
 }

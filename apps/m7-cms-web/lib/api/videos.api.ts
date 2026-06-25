@@ -28,30 +28,27 @@ export async function listVideos(params?: {
  * Get a single video by ID.
  */
 export async function getVideo(id: string): Promise<VideoItem> {
-  return apiRequest<VideoItem>(`/videos/${id}`);
+  const res = await apiRequest<{ data: VideoItem }>(`/videos/${id}`);
+  return res.data;
 }
 
-/**
- * Create a new video entry.
- */
 export async function createVideo(data: CreateVideoInput): Promise<VideoItem> {
-  return apiRequest<VideoItem>("/videos", {
+  const res = await apiRequest<{ data: VideoItem }>("/videos", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return res.data;
 }
 
-/**
- * Update a video.
- */
 export async function updateVideo(
   id: string,
   data: Partial<CreateVideoInput>
 ): Promise<VideoItem> {
-  return apiRequest<VideoItem>(`/videos/${id}`, {
+  const res = await apiRequest<{ data: VideoItem }>(`/videos/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+  return res.data;
 }
 
 /**

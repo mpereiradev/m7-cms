@@ -102,6 +102,7 @@ export class DrizzleStoreRepository implements IStoreRepository {
       .values({
         tenantId: data.tenantId,
         slug: data.slug,
+        mapUrl: data.mapUrl ?? null,
       })
       .returning();
 

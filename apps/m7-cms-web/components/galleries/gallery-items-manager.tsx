@@ -130,7 +130,7 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
   useEffect(() => {
     if (gallery?.items) {
       setItems(
-        [...gallery.items].sort((a, b) => a.sortOrder - b.sortOrder)
+        [...gallery.items].sort((a, b) => a.order - b.order)
       );
     }
   }, [gallery?.items]);

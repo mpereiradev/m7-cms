@@ -35,7 +35,9 @@ export default function EditStorePage({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Editar Loja</h1>
-        <p className="text-muted-foreground">{store.name}</p>
+        <p className="text-muted-foreground">
+          {store.translations[0]?.name ?? store.slug}
+        </p>
       </div>
       <StoreForm store={store} />
       <StoreHoursManager storeId={store.id} hours={store.hours} />

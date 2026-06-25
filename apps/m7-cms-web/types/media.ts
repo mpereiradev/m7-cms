@@ -28,12 +28,9 @@ export type MediaListParams = {
 
 export type PaginatedResponse<T> = {
   data: T[];
-  meta: {
-    total: number;
-    page: number;
-    perPage: number;
-    totalPages: number;
-  };
+  total?: number;
+  page?: number;
+  perPage?: number;
 };
 
 export type Gallery = {
@@ -56,7 +53,7 @@ export type GalleryItem = {
   url: string;
   thumbnailUrl: string | null;
   caption: string | null;
-  sortOrder: number;
+  order: number;
   createdAt: string;
 };
 
@@ -85,7 +82,7 @@ export type VideoItem = {
   url: string;
   provider: "youtube" | "vimeo" | "local" | "other";
   thumbnailUrl: string | null;
-  sortOrder: number;
+  order: number;
   galleryId: string;
   createdAt: string;
   updatedAt: string;

@@ -22,6 +22,7 @@ export class StoreResponseDto {
   id!: string;
   tenantId!: string;
   slug!: string;
+  mapUrl!: string | null;
   translations!: StoreTranslationResponseDto[];
   hours!: StoreHourResponseDto[];
   createdAt!: string;
@@ -32,6 +33,7 @@ export class StoreResponseDto {
     dto.id = entity.id;
     dto.tenantId = entity.tenantId;
     dto.slug = entity.slug;
+    dto.mapUrl = entity.mapUrl;
     dto.createdAt = entity.createdAt.toISOString();
     dto.updatedAt = entity.updatedAt.toISOString();
 

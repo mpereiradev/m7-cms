@@ -3,57 +3,47 @@ import { z } from "zod";
 export const bannerSchema = z
   .object({
     title: z.string().min(1, "O titulo e obrigatorio"),
-    imageUrl: z.string().min(1, "A imagem e obrigatoria").url("Informe uma URL valida"),
+    mediaId: z.string(),
     ctaLabel: z.string(),
-    ctaUrl: z.string(),
-    pageTarget: z.string(),
-    isActive: z.boolean(),
-    startsAt: z.string(),
-    endsAt: z.string(),
+    linkUrl: z.string(),
+    displayStart: z.string().min(1, "A data de inicio e obrigatoria"),
+    displayEnd: z.string(),
+    order: z.number().int().min(0),
   })
   .refine(
     (data) => {
-      if (data.startsAt && data.endsAt) {
-        return new Date(data.startsAt) <= new Date(data.endsAt);
+      if (data.displayStart && data.displayEnd) {
+        return new Date(data.displayStart) <= new Date(data.displayEnd);
       }
       return true;
     },
     {
       message: "A data de inicio deve ser anterior a data de termino",
-      path: ["endsAt"],
+      path: ["displayEnd"],
     }
   );
 
 export type BannerFormValues = z.infer<typeof bannerSchema>;
 
-export type BannerStatus = "active" | "scheduled" | "expired" | "inactive";
+export type BannerStatus = "active" | "scheduled" | "expired";
 
 export type Banner = {
   id: string;
   tenantId: string;
-  title: string;
-  imageUrl: string;
+  title: string | null;
+  mediaId: string | null;
   ctaLabel: string | null;
-  ctaUrl: string | null;
-  pageTarget: string;
-  isActive: boolean;
-  startsAt: string | null;
-  endsAt: string | null;
-  sortOrder: number;
+  linkUrl: string | null;
+  displayStart: string | null;
+  displayEnd: string | null;
+  order: number;
   createdAt: string;
   updatedAt: string;
 };
 
-/**
- * Derive display status from banner data.
- */
 export function getBannerStatus(banner: Banner): BannerStatus {
-  if (!banner.isActive) return "inactive";
-
   const now = new Date();
-
-  if (banner.startsAt && new Date(banner.startsAt) > now) return "scheduled";
-  if (banner.endsAt && new Date(banner.endsAt) < now) return "expired";
-
+  if (banner.displayStart && new Date(banner.displayStart) > now) return "scheduled";
+  if (banner.displayEnd && new Date(banner.displayEnd) < now) return "expired";
   return "active";
 }

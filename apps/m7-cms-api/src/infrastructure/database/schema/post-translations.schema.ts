@@ -10,4 +10,6 @@ export const postTranslations = pgTable('post_translations', {
   title: varchar('title', { length: 500 }).notNull(),
   summary: text('summary'),
   content: jsonb('content'),
+  seoTitle: varchar('seo_title', { length: 500 }),
+  seoDescription: text('seo_description'),
 });

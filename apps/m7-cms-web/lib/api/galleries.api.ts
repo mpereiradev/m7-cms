@@ -30,32 +30,29 @@ export async function listGalleries(params?: {
  * Get a single gallery with its items.
  */
 export async function getGallery(id: string): Promise<GalleryDetail> {
-  return apiRequest<GalleryDetail>(`/galleries/${id}`);
+  const res = await apiRequest<{ data: GalleryDetail }>(`/galleries/${id}`);
+  return res.data;
 }
 
-/**
- * Create a new gallery.
- */
 export async function createGallery(
   data: CreateGalleryInput
 ): Promise<Gallery> {
-  return apiRequest<Gallery>("/galleries", {
+  const res = await apiRequest<{ data: Gallery }>("/galleries", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return res.data;
 }
 
-/**
- * Update a gallery's metadata.
- */
 export async function updateGallery(
   id: string,
   data: Partial<CreateGalleryInput>
 ): Promise<Gallery> {
-  return apiRequest<Gallery>(`/galleries/${id}`, {
+  const res = await apiRequest<{ data: Gallery }>(`/galleries/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+  return res.data;
 }
 
 /**

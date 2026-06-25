@@ -1,28 +1,34 @@
 import { z } from "zod";
 
-export const storeHoursSchema = z.object({
-  dayOfWeek: z.number().min(0).max(6),
-  isOpen: z.boolean(),
-  openTime: z.string().nullable(),
-  closeTime: z.string().nullable(),
+export const storeTranslationSchema = z.object({
+  languageCode: z.string().min(1),
+  name: z.string().min(1, "O nome e obrigatorio"),
+  address: z.string(),
+  description: z.string(),
 });
 
 export const storeFormSchema = z.object({
-  name: z.string().min(1, "Nome da loja e obrigatorio"),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email("E-mail invalido").optional().or(z.literal("")),
-  mapUrl: z.string().url("URL invalida").optional().or(z.literal("")),
-  description: z.string().optional(),
-  isActive: z.boolean(),
-});
-
-export const storeHoursFormSchema = z.object({
-  hours: z.array(storeHoursSchema).length(7),
+  slug: z.string().min(1, "O slug e obrigatorio"),
+  mapUrl: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  whatsapp: z.string(),
+  translations: z.object({
+    "pt-BR": storeTranslationSchema,
+    en: storeTranslationSchema.partial(),
+  }),
 });
 
 export type StoreFormValues = z.infer<typeof storeFormSchema>;
+
+export const storeHourSchema = z.object({
+  weekday: z.number().min(0).max(6),
+  openTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato HH:mm"),
+  closeTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato HH:mm"),
+});
+
+export const storeHoursFormSchema = z.object({
+  hours: z.array(storeHourSchema),
+});
+
 export type StoreHoursFormValues = z.infer<typeof storeHoursFormSchema>;

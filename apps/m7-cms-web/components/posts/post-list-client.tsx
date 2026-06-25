@@ -79,15 +79,17 @@ export function PostListClient() {
       },
     },
     {
-      accessorKey: "categories",
+      accessorKey: "categoryIds",
       header: "Categorias",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
-          {row.original.categories.map((c) => (
-            <Badge key={c.id} variant="outline" className="text-xs">
-              {c.name}
+          {row.original.categoryIds.length > 0 ? (
+            <Badge variant="outline" className="text-xs">
+              {row.original.categoryIds.length} categoria(s)
             </Badge>
-          ))}
+          ) : (
+            <span className="text-xs text-muted-foreground">--</span>
+          )}
         </div>
       ),
     },

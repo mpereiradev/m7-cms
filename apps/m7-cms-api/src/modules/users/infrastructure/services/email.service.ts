@@ -23,7 +23,7 @@ export class EmailService implements IEmailService {
   private get supabase(): SupabaseClient | null {
     if (!this._supabase) {
       const url = process.env.SUPABASE_URL;
-      const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const key = process.env.SUPABASE_SECRET_KEY;
       if (url && key && !key.startsWith('placeholder')) {
         this._supabase = createClient(url, key);
       }

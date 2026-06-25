@@ -24,11 +24,21 @@ export class DrizzleTagRepository implements ITagRepository {
     return rows.map((row) => new TagEntity(row));
   }
 
-  async create(data: { tenantId: string; slug: string }): Promise<TagEntity> {
+  async create(data: {
+    tenantId: string;
+    name: string;
+    slug: string;
+  }): Promise<TagEntity> {
     const [row] = await db
       .insert(tags)
-      .values({ tenantId: data.tenantId, slug: data.slug })
+      .values({ tenantId: data.tenantId, name: data.name, slug: data.slug })
       .returning();
     return new TagEntity(row);
+  }
+
+  async delete(tenantId: string, id: string): Promise<void> {
+    await db
+      .delete(tags)
+      .where(and(eq(tags.tenantId, tenantId), eq(tags.id, id)));
   }
 }

@@ -9,14 +9,20 @@ import {
   categoryFormSchema,
   type CategoryFormValues,
   type Category,
+  getCategoryName,
+  buildCategoryTree,
+  flattenTree,
 } from "@/lib/schemas/category.schema";
 import {
+  useCategories,
   useCreateCategory,
   useUpdateCategory,
 } from "@/lib/hooks/use-categories";
 import { LangTabs } from "@/components/shared/lang-tabs";
+import { SlugField } from "@/components/shared/slug-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -25,6 +31,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -45,26 +58,33 @@ export function CategoryForm({
 }: CategoryFormProps) {
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
+  const { data: allCategories } = useCategories();
   const isEditing = !!category;
 
   const ptBr = category?.translations.find((t) => t.languageCode === "pt-BR");
   const en = category?.translations.find((t) => t.languageCode === "en");
 
+  const tree = buildCategoryTree(allCategories ?? [], 3);
+  const flatOptions = flattenTree(tree).filter(
+    ({ node, depth }) => depth < 2 && node.id !== category?.id
+  );
+
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
+      slug: category?.slug ?? "",
       parentId: category?.parentId ?? null,
-      displayOrder: category?.displayOrder ?? 0,
+      order: category?.order ?? 0,
       translations: {
         "pt-BR": {
           languageCode: "pt-BR",
           name: ptBr?.name ?? "",
-          slug: ptBr?.slug ?? "",
+          description: ptBr?.description ?? "",
         },
         en: {
           languageCode: "en",
           name: en?.name ?? "",
-          slug: en?.slug ?? "",
+          description: en?.description ?? "",
         },
       },
     },
@@ -72,12 +92,13 @@ export function CategoryForm({
 
   async function onSubmit(values: CategoryFormValues) {
     const translations = Object.values(values.translations).filter(
-      (t) => t.name && t.slug
+      (t) => t.name
     );
 
     const payload = {
-      parentId: values.parentId,
-      displayOrder: values.displayOrder,
+      slug: values.slug,
+      parentId: values.parentId || null,
+      order: values.order,
       translations,
     };
 
@@ -120,36 +141,35 @@ export function CategoryForm({
             <LangTabs>
               {(lang) => (
                 <div className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name={`translations.${lang}.name`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Nome {lang === "en" ? "(English)" : "(Portugues)"}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Nome da categoria"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-1.5">
+                    <FormField
+                      control={form.control}
+                      name={`translations.${lang}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Nome {lang === "en" ? "(English)" : "(Portugues)"} {lang === "pt-BR" && "*"}
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome da categoria" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {lang === "pt-BR" && (
+                      <SlugField form={form} sourceField="translations.pt-BR.name" />
                     )}
-                  />
+                  </div>
 
                   <FormField
                     control={form.control}
-                    name={`translations.${lang}.slug`}
+                    name={`translations.${lang}.description`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Slug</FormLabel>
+                        <FormLabel>Descricao</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="nome-da-categoria"
-                            {...field}
-                          />
+                          <Textarea placeholder="Descricao da categoria" rows={2} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -161,7 +181,38 @@ export function CategoryForm({
 
             <FormField
               control={form.control}
-              name="displayOrder"
+              name="parentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria pai</FormLabel>
+                  <Select
+                    onValueChange={(val) =>
+                      field.onChange(val === "__none__" ? null : val)
+                    }
+                    value={field.value ?? "__none__"}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Nenhuma (raiz)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="__none__">Nenhuma (raiz)</SelectItem>
+                      {flatOptions.map(({ node, depth }) => (
+                        <SelectItem key={node.id} value={node.id}>
+                          {"—".repeat(depth)} {getCategoryName(node)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="order"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Ordem de exibicao</FormLabel>

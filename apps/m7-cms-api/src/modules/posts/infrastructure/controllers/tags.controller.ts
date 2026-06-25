@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
+import { IsString, MaxLength } from 'class-validator';
 import {
   JwtAuthGuard,
   RolesGuard,
@@ -10,8 +23,18 @@ import {
 import { CreateTagUseCase } from '../../application/use-cases/create-tag.use-case.js';
 import { ListTagsUseCase } from '../../application/use-cases/list-tags.use-case.js';
 import { TagResponseDto } from '../../application/dtos/post-response.dto.js';
+import {
+  TAG_REPOSITORY,
+  type ITagRepository,
+} from '../../application/ports/i-post-repository.port.js';
 
 class CreateTagDto {
+  @IsString()
+  @MaxLength(255)
+  name!: string;
+
+  @IsString()
+  @MaxLength(255)
   slug!: string;
 }
 
@@ -21,6 +44,8 @@ export class TagsController {
   constructor(
     private readonly createTagUseCase: CreateTagUseCase,
     private readonly listTagsUseCase: ListTagsUseCase,
+    @Inject(TAG_REPOSITORY)
+    private readonly tagRepository: ITagRepository,
   ) {}
 
   @Get()
@@ -40,8 +65,19 @@ export class TagsController {
   ): Promise<{ data: TagResponseDto }> {
     const tag = await this.createTagUseCase.execute({
       tenantId: user.tenantId,
+      name: dto.name,
       slug: dto.slug,
     });
     return { data: TagResponseDto.fromEntity(tag) };
+  }
+
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(
+    @CurrentUser() user: UserContext,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.tagRepository.delete(user.tenantId, id);
   }
 }

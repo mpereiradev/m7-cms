@@ -46,6 +46,10 @@ export class CreateStoreDto {
   @MaxLength(255)
   slug!: string;
 
+  @IsOptional()
+  @IsString()
+  mapUrl?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => StoreTranslationDto)
@@ -57,6 +61,10 @@ export class UpdateStoreDto {
   @IsString()
   @MaxLength(255)
   slug?: string;
+
+  @IsOptional()
+  @IsString()
+  mapUrl?: string;
 
   @IsOptional()
   @IsArray()

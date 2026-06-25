@@ -136,7 +136,10 @@ export class DrizzlePostRepository implements IPostRepository {
   async create(data: {
     tenantId: string;
     slug: string;
+    status?: string;
+    publishedAt?: Date | null;
     authorId: string | null;
+    coverMediaId?: string | null;
     categoryIds?: string[];
     tagIds?: string[];
     translations: {
@@ -144,6 +147,8 @@ export class DrizzlePostRepository implements IPostRepository {
       title: string;
       summary?: string | null;
       content?: unknown;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
     }[];
   }): Promise<PostEntity> {
     const [row] = await db
@@ -151,7 +156,10 @@ export class DrizzlePostRepository implements IPostRepository {
       .values({
         tenantId: data.tenantId,
         slug: data.slug,
+        status: (data.status as any) ?? 'draft',
+        publishedAt: data.publishedAt ?? null,
         authorId: data.authorId,
+        coverMediaId: data.coverMediaId ?? null,
       })
       .returning();
 
@@ -163,6 +171,8 @@ export class DrizzlePostRepository implements IPostRepository {
           title: t.title,
           summary: t.summary ?? null,
           content: t.content ?? null,
+          seoTitle: t.seoTitle ?? null,
+          seoDescription: t.seoDescription ?? null,
         })),
       );
     }
@@ -183,6 +193,7 @@ export class DrizzlePostRepository implements IPostRepository {
       slug?: string;
       status?: 'draft' | 'published';
       publishedAt?: Date | null;
+      coverMediaId?: string | null;
       categoryIds?: string[];
       tagIds?: string[];
       translations?: {
@@ -190,6 +201,8 @@ export class DrizzlePostRepository implements IPostRepository {
         title: string;
         summary?: string | null;
         content?: unknown;
+        seoTitle?: string | null;
+        seoDescription?: string | null;
       }[];
     },
   ): Promise<PostEntity | null> {
@@ -201,6 +214,8 @@ export class DrizzlePostRepository implements IPostRepository {
     if (data.status) updateData.status = data.status;
     if (data.publishedAt !== undefined)
       updateData.publishedAt = data.publishedAt;
+    if (data.coverMediaId !== undefined)
+      updateData.coverMediaId = data.coverMediaId;
 
     await db
       .update(posts)
@@ -217,6 +232,8 @@ export class DrizzlePostRepository implements IPostRepository {
             title: t.title,
             summary: t.summary ?? null,
             content: t.content ?? null,
+            seoTitle: t.seoTitle ?? null,
+            seoDescription: t.seoDescription ?? null,
           })),
         );
       }
