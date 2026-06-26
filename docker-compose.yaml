@@ -1,0 +1,24 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/m7-cms-api/Dockerfile
+    image: m7-cms-api
+    ports:
+      - "3001:3001"
+    env_file:
+      - apps/m7-cms-api/.env
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/m7-cms-web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}
+    image: m7-cms-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
