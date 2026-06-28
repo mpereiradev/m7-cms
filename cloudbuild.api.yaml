@@ -1,0 +1,48 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: build
+    args:
+      - build
+      - --no-cache
+      - -t
+      - southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api:$COMMIT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api:latest
+      - -f
+      - apps/m7-cms-api/Dockerfile
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    id: push
+    args:
+      - push
+      - --all-tags
+      - southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - m7-cms-api
+      - --image=southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api:$COMMIT_SHA
+      - --region=southamerica-east1
+      - --platform=managed
+      - --allow-unauthenticated
+      - --ingress=all
+      - --port=3001
+      - --min-instances=1
+      - --max-instances=2
+      - --memory=512Mi
+      - --cpu=1
+      - --set-secrets=DATABASE_URL=m7-cms-api-DATABASE_URL:latest,SUPABASE_JWKS_URL=m7-cms-api-SUPABASE_JWKS_URL:latest,SMTP_HOST=m7-cms-api-SMTP_HOST:latest,SMTP_PORT=m7-cms-api-SMTP_PORT:latest,SMTP_USER=m7-cms-api-SMTP_USER:latest,SMTP_PASS=m7-cms-api-SMTP_PASS:latest,SMTP_FROM=m7-cms-api-SMTP_FROM:latest
+      - --quiet
+
+images:
+  - southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api:$COMMIT_SHA
+  - southamerica-east1-docker.pkg.dev/glass-sylph-491920-a4/m7-cms/m7-cms-api:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
