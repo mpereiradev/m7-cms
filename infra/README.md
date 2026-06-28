@@ -2,6 +2,7 @@
 
 ## Visão Geral
 
+
 O projeto roda duas aplicações independentes no **Cloud Run**, com CI/CD automático via **Cloud Build** acionado por push na branch `main` do GitHub.
 
 ```
