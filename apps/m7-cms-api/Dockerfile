@@ -14,7 +14,7 @@ RUN test -f dist/main.js
 
 WORKDIR /app
 
-# ── Stage 2: prod deps only ───────────────────────────────────────
+# ── Stage 2: prod deps via pnpm deploy (flat node_modules, sem symlinks) ──
 FROM node:22-alpine AS prod-deps
 RUN npm i -g pnpm@11
 WORKDIR /app
@@ -22,7 +22,8 @@ WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/m7-cms-api/package.json apps/m7-cms-api/package.json
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter m7-cms-api deploy --prod --legacy /app/deploy
 
 # ── Stage 3: production runtime ──────────────────────────────────
 FROM node:22-alpine AS runtime
@@ -33,7 +34,7 @@ ENV NODE_ENV=production
 ENV PORT=3001
 
 COPY --from=build /app/apps/m7-cms-api/dist ./dist
-COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=prod-deps /app/deploy/node_modules ./node_modules
 COPY apps/m7-cms-api/package.json ./package.json
 
 EXPOSE 3001
