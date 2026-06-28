@@ -20,6 +20,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 COPY --from=build /app/apps/m7-cms-web/.next/standalone ./
 COPY --from=build /app/apps/m7-cms-web/.next/static ./apps/m7-cms-web/.next/static
