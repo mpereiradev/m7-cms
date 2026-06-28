@@ -7,7 +7,8 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/m7-cms-api ./apps/m7-cms-api
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter m7-cms-api build
+RUN cd apps/m7-cms-api && /app/node_modules/.bin/tsc -p tsconfig.build.json
+RUN test -f apps/m7-cms-api/dist/main.js
 
 # ── Stage 2: prod deps only ───────────────────────────────────────
 FROM node:22-alpine AS prod-deps
