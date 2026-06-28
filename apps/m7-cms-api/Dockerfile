@@ -9,11 +9,7 @@ COPY apps/m7-cms-api ./apps/m7-cms-api
 RUN pnpm install --frozen-lockfile
 
 WORKDIR /app/apps/m7-cms-api
-RUN echo "=== CWD ===" && pwd
-RUN echo "=== SOURCE FILES ===" && find src -name "*.ts" | head -20
-RUN echo "=== TSC VERSION ===" && pnpm exec tsc --version
-RUN echo "=== RUNNING TSC ===" && pnpm exec tsc -p tsconfig.build.json; echo "TSC EXIT: $?"
-RUN echo "=== DIST CONTENTS ===" && ls -la dist/ 2>&1 || echo "NO DIST DIR"
+RUN pnpm exec tsc -p tsconfig.build.json
 RUN test -f dist/main.js
 
 WORKDIR /app
