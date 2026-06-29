@@ -11,6 +11,8 @@ export interface IGalleryRepository {
   createGallery(data: {
     tenantId: string;
     slug: string;
+    title?: string;
+    type?: string;
   }): Promise<GalleryEntity>;
   deleteGallery(tenantId: string, id: string): Promise<boolean>;
 

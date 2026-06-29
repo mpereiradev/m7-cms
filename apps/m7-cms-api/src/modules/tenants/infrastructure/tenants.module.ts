@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../../auth/infrastructure/auth.module.js';
+import { UsersModule } from '../../users/infrastructure/users.module.js';
 
 // Application — ports
 import { TENANT_REPOSITORY } from '../application/ports/i-tenant-repository.port.js';
@@ -15,7 +16,7 @@ import { DrizzleTenantRepository } from './repositories/drizzle-tenant.repositor
 import { TenantsController } from './controllers/tenants.controller.js';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, UsersModule],
   controllers: [TenantsController],
   providers: [
     // Port implementations

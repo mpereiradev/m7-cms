@@ -20,10 +20,10 @@ import {
 import { useCreateVideo, useUpdateVideo, useVideo } from "@/lib/hooks/use-videos";
 
 const videoSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  url: z.string().url("Must be a valid URL"),
+  title: z.string().min(1, "Titulo e obrigatorio"),
+  url: z.string().url("Deve ser uma URL valida"),
   description: z.string().optional(),
-  thumbnailUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  thumbnailUrl: z.string().url("Deve ser uma URL valida").optional().or(z.literal("")),
 });
 
 type VideoFormValues = z.infer<typeof videoSchema>;
@@ -148,7 +148,7 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
             galleryId,
           },
         });
-        toast.success("Video updated");
+        toast.success("Video atualizado");
       } else {
         await createMutation.mutateAsync({
           title: values.title,
@@ -157,17 +157,17 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
           thumbnailUrl: values.thumbnailUrl || undefined,
           galleryId,
         });
-        toast.success("Video added");
+        toast.success("Video adicionado");
       }
       router.push(backPath);
     } catch {
-      toast.error(isEditing ? "Failed to update video" : "Failed to add video");
+      toast.error(isEditing ? "Falha ao atualizar video" : "Falha ao adicionar video");
     }
   };
 
   if (isEditing && isLoading) {
     return (
-      <div className="py-8 text-center text-muted-foreground">Loading...</div>
+      <div className="py-8 text-center text-muted-foreground">Carregando...</div>
     );
   }
 
@@ -177,21 +177,21 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">
-          {isEditing ? "Edit Video" : "Add Video"}
+          {isEditing ? "Editar Video" : "Adicionar Video"}
         </h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Video Details</CardTitle>
+          <CardTitle>Detalhes do Video</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Titulo</Label>
             <Input
               id="title"
               {...form.register("title")}
-              placeholder="Video title"
+              placeholder="Titulo do video"
             />
             {form.formState.errors.title && (
               <p className="text-sm text-destructive">
@@ -201,11 +201,11 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="url">Video URL</Label>
+            <Label htmlFor="url">URL do Video</Label>
             <Input
               id="url"
               {...form.register("url")}
-              placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+              placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/..."
             />
             {form.formState.errors.url && (
               <p className="text-sm text-destructive">
@@ -215,7 +215,7 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
             {detectedProvider && (
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  Detected:
+                  Detectado:
                 </span>
                 <Badge variant="secondary">
                   {detectedProvider === "youtube"
@@ -223,8 +223,8 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
                     : detectedProvider === "vimeo"
                       ? "Vimeo"
                       : detectedProvider === "local"
-                        ? "Local file"
-                        : "External"}
+                        ? "Arquivo local"
+                        : "Externo"}
                 </Badge>
                 {detectedProvider === "vimeo" && getVimeoId(watchedUrl) && (
                   <span className="text-xs text-muted-foreground">
@@ -236,17 +236,17 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Descricao</Label>
             <Textarea
               id="description"
               {...form.register("description")}
-              placeholder="Optional description..."
+              placeholder="Descricao opcional..."
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
+            <Label htmlFor="thumbnailUrl">URL da Miniatura</Label>
             <Input
               id="thumbnailUrl"
               {...form.register("thumbnailUrl")}
@@ -261,7 +261,7 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
               <div className="mt-2">
                 <img
                   src={watchedThumbnail}
-                  alt="Thumbnail preview"
+                  alt="Pre-visualizacao da miniatura"
                   className="h-24 w-auto rounded border object-cover"
                 />
               </div>
@@ -273,17 +273,17 @@ export function VideoForm({ galleryId, videoId, backPath }: VideoFormProps) {
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isPending}>
           {isPending
-            ? "Saving..."
+            ? "Salvando..."
             : isEditing
-              ? "Save Changes"
-              : "Add Video"}
+              ? "Salvar Alteracoes"
+              : "Adicionar Video"}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push(backPath)}
         >
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>

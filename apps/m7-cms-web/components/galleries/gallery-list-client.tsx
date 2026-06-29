@@ -44,11 +44,11 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
     if (!newTitle.trim()) return;
     try {
       await createMutation.mutateAsync({ title: newTitle.trim(), type });
-      toast.success("Gallery created");
+      toast.success("Galeria criada");
       setNewTitle("");
       setShowCreate(false);
     } catch {
-      toast.error("Failed to create gallery");
+      toast.error("Falha ao criar galeria");
     }
   };
 
@@ -56,10 +56,10 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
     if (!deleteTarget) return;
     try {
       await deleteMutation.mutateAsync(deleteTarget.id);
-      toast.success("Gallery deleted");
+      toast.success("Galeria excluida");
       setDeleteTarget(null);
     } catch {
-      toast.error("Failed to delete gallery");
+      toast.error("Falha ao excluir galeria");
     }
   };
 
@@ -82,28 +82,28 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
-            {type === "image" ? "Image Galleries" : "Video Galleries"}
+            {type === "image" ? "Galerias de Imagens" : "Galerias de Videos"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage your {type} galleries
+            Gerencie suas galerias de {type === "image" ? "imagens" : "videos"}
           </p>
         </div>
         <Button onClick={() => setShowCreate(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          New Gallery
+          Nova Galeria
         </Button>
       </div>
 
       {galleries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <TypeIcon className="mb-3 h-12 w-12" />
-          <p className="text-sm">No galleries yet</p>
+          <p className="text-sm">Nenhuma galeria criada</p>
           <Button
             variant="outline"
             className="mt-4"
             onClick={() => setShowCreate(true)}
           >
-            Create your first gallery
+            Criar primeira galeria
           </Button>
         </div>
       ) : (
@@ -127,7 +127,7 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">{gallery.title}</CardTitle>
                   <CardDescription>
-                    {gallery.itemCount} {gallery.itemCount === 1 ? "item" : "items"}
+                    {gallery.itemCount} {gallery.itemCount === 1 ? "item" : "itens"}
                   </CardDescription>
                 </CardHeader>
               </Link>
@@ -142,7 +142,7 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
                   }}
                 >
                   <Trash2 className="mr-1 h-4 w-4" />
-                  Delete
+                  Excluir
                 </Button>
               </CardContent>
             </Card>
@@ -154,19 +154,19 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create gallery</DialogTitle>
+            <DialogTitle>Nova galeria</DialogTitle>
             <DialogDescription>
-              Give your new {type} gallery a name.
+              Defina um nome para a nova galeria de {type === "image" ? "imagens" : "videos"}.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="gallery-title">Title</Label>
+              <Label htmlFor="gallery-title">Nome</Label>
               <Input
                 id="gallery-title"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Gallery title"
+                placeholder="Nome da galeria"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleCreate();
                 }}
@@ -175,13 +175,13 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreate(false)}>
-              Cancel
+              Cancelar
             </Button>
             <Button
               onClick={handleCreate}
               disabled={!newTitle.trim() || createMutation.isPending}
             >
-              {createMutation.isPending ? "Creating..." : "Create"}
+              {createMutation.isPending ? "Criando..." : "Criar"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -191,23 +191,23 @@ export function GalleryListClient({ type, basePath }: GalleryListClientProps) {
       <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete gallery</DialogTitle>
+            <DialogTitle>Excluir galeria</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{deleteTarget?.title}&quot;?
-              All items in this gallery will also be removed. This action cannot
-              be undone.
+              Tem certeza que deseja excluir &quot;{deleteTarget?.title}&quot;?
+              Todos os itens desta galeria tambem serao removidos. Esta acao nao
+              pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Cancel
+              Cancelar
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
             </Button>
           </DialogFooter>
         </DialogContent>

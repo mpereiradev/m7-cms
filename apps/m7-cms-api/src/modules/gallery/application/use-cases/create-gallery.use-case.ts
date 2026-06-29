@@ -7,7 +7,18 @@ import {
 
 export interface CreateGalleryInput {
   tenantId: string;
-  slug: string;
+  slug?: string;
+  title?: string;
+  type?: string;
+}
+
+function toSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 @Injectable()
@@ -18,6 +29,14 @@ export class CreateGalleryUseCase {
   ) {}
 
   async execute(input: CreateGalleryInput): Promise<GalleryEntity> {
-    return this.galleryRepository.createGallery(input);
+    const slug =
+      input.slug ||
+      (input.title ? toSlug(input.title) : `gallery-${Date.now()}`);
+    return this.galleryRepository.createGallery({
+      tenantId: input.tenantId,
+      slug,
+      title: input.title,
+      type: input.type,
+    });
   }
 }

@@ -18,7 +18,7 @@ export default function VideoGalleryDetailPage({
       <Button variant="ghost" size="sm" asChild>
         <Link href="/galleries/videos">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to galleries
+          Voltar para galerias
         </Link>
       </Button>
       <VideoListClient galleryId={id} basePath={`/galleries/videos/${id}`} />

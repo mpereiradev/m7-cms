@@ -7,8 +7,10 @@ import {
   inviteUser,
   updateRole,
   removeUser,
+  createUserDirect,
   type InviteUserPayload,
   type UpdateRolePayload,
+  type CreateUserDirectPayload,
 } from "@/lib/api/users.api";
 
 export function useUsers(params?: {
@@ -64,6 +66,21 @@ export function useRemoveUser() {
     },
     onError: (error: Error) => {
       toast.error(error.message || "Erro ao remover usuario");
+    },
+  });
+}
+
+export function useCreateUserDirect() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateUserDirectPayload) => createUserDirect(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Usuario criado com sucesso");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Erro ao criar usuario");
     },
   });
 }

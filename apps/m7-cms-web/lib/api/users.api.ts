@@ -5,19 +5,32 @@ import type { Role } from "@/types/auth";
 
 export type TenantUser = {
   id: string;
+  userId: string;
+  tenantId: string;
   email: string;
-  fullName: string | null;
-  avatarUrl: string | null;
+  name: string | null;
   role: Role;
-  lastSignInAt: string | null;
+  photoUrl: string | null;
   createdAt: string;
 };
 
+export type UserTenantAssociation = {
+  tenantId: string;
+  tenantName: string;
+  tenantSlug: string;
+  role: Role;
+};
+
+export type GlobalUser = {
+  userId: string;
+  email: string;
+  name: string | null;
+  photoUrl: string | null;
+  tenants: UserTenantAssociation[];
+};
+
 export type UserListResponse = {
-  data: TenantUser[];
-  total: number;
-  page: number;
-  perPage: number;
+  data: TenantUser[] | GlobalUser[];
 };
 
 export type InviteUserPayload = {
@@ -45,6 +58,10 @@ export async function listUsers(params?: {
   return apiRequest<UserListResponse>(`/users${query ? `?${query}` : ""}`);
 }
 
+export function isGlobalUser(user: TenantUser | GlobalUser): user is GlobalUser {
+  return "tenants" in user;
+}
+
 export async function inviteUser(data: InviteUserPayload): Promise<void> {
   return apiRequest<void>("/users/invite", {
     method: "POST",
@@ -65,5 +82,22 @@ export async function updateRole(
 export async function removeUser(userId: string): Promise<void> {
   return apiRequest<void>(`/users/${userId}`, {
     method: "DELETE",
+  });
+}
+
+export type CreateUserDirectPayload = {
+  email: string;
+  name: string;
+  password: string;
+  tenantId: string;
+  role: Role;
+};
+
+export async function createUserDirect(
+  data: CreateUserDirectPayload
+): Promise<{ data: TenantUser }> {
+  return apiRequest<{ data: TenantUser }>("/users/direct", {
+    method: "POST",
+    body: JSON.stringify(data),
   });
 }

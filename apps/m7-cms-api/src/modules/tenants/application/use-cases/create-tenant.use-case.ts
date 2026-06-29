@@ -4,6 +4,10 @@ import {
   TENANT_REPOSITORY,
   type ITenantRepository,
 } from '../ports/i-tenant-repository.port.js';
+import {
+  USER_REPOSITORY,
+  type IUserRepository,
+} from '../../../users/application/ports/i-user-repository.port.js';
 
 export interface CreateTenantInput {
   slug: string;
@@ -19,9 +23,20 @@ export class CreateTenantUseCase {
   constructor(
     @Inject(TENANT_REPOSITORY)
     private readonly tenantRepository: ITenantRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
   async execute(input: CreateTenantInput): Promise<TenantEntity> {
-    return this.tenantRepository.create(input);
+    const tenant = await this.tenantRepository.create(input);
+
+    const superAdminIds = await this.userRepository.findSuperAdminUserIds();
+    await this.userRepository.linkUsersToTenant(
+      tenant.id,
+      superAdminIds,
+      'super_admin',
+    );
+
+    return tenant;
   }
 }

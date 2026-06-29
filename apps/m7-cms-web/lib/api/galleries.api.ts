@@ -34,12 +34,26 @@ export async function getGallery(id: string): Promise<GalleryDetail> {
   return res.data;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export async function createGallery(
   data: CreateGalleryInput
 ): Promise<Gallery> {
+  const payload = {
+    title: data.title,
+    slug: data.slug ?? slugify(data.title),
+    type: data.type,
+  };
   const res = await apiRequest<{ data: Gallery }>("/galleries", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
   return res.data;
 }

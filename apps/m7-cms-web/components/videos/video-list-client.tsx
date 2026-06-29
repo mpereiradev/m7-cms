@@ -62,7 +62,7 @@ function getProviderLabel(provider: string): string {
     case "local":
       return "Local";
     default:
-      return "External";
+      return "Externo";
   }
 }
 
@@ -136,7 +136,7 @@ function SortableVideoCard({
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
-                <ExternalLink className="inline h-3 w-3" /> Open
+                <ExternalLink className="inline h-3 w-3" /> Abrir
               </a>
             </div>
           </div>
@@ -202,10 +202,10 @@ export function VideoListClient({ galleryId, basePath }: VideoListClientProps) {
     try {
       await deleteMutation.mutateAsync(deleteTarget.id);
       setVideoList((prev) => prev.filter((v) => v.id !== deleteTarget.id));
-      toast.success("Video deleted");
+      toast.success("Video excluido");
       setDeleteTarget(null);
     } catch {
-      toast.error("Failed to delete video");
+      toast.error("Falha ao excluir video");
     }
   };
 
@@ -225,7 +225,7 @@ export function VideoListClient({ galleryId, basePath }: VideoListClientProps) {
         <div>
           <h1 className="text-2xl font-bold">Videos</h1>
           <p className="text-sm text-muted-foreground">
-            {videoList.length} {videoList.length === 1 ? "video" : "videos"}
+            {videoList.length} {videoList.length === 1 ? "video" : "videos"} cadastrado{videoList.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Button asChild>

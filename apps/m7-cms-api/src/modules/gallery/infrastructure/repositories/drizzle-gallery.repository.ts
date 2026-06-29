@@ -82,6 +82,8 @@ export class DrizzleGalleryRepository implements IGalleryRepository {
   async createGallery(data: {
     tenantId: string;
     slug: string;
+    title?: string;
+    type?: string;
   }): Promise<GalleryEntity> {
     const rows = await db
       .insert(galleries)
@@ -91,7 +93,12 @@ export class DrizzleGalleryRepository implements IGalleryRepository {
       })
       .returning();
 
-    return this.toGalleryEntity(rows[0]);
+    const entity = this.toGalleryEntity(rows[0]);
+    return new GalleryEntity({
+      ...entity,
+      title: data.title ?? null,
+      type: data.type ?? 'image',
+    });
   }
 
   async deleteGallery(tenantId: string, id: string): Promise<boolean> {

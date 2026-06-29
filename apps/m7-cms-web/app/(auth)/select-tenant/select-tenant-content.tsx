@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Building2, Loader2 } from "lucide-react";
@@ -11,11 +10,10 @@ import { Building2, Loader2 } from "lucide-react";
  */
 export function SelectTenantContent() {
   const { user, isLoading, setTenantId } = useAuth();
-  const router = useRouter();
 
   function handleSelect(tenantId: string) {
     setTenantId(tenantId);
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   if (isLoading) {

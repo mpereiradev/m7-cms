@@ -171,9 +171,9 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
         galleryId,
         data: { mediaId: result.id },
       });
-      toast.success("Item added to gallery");
+      toast.success("Item adicionado a galeria");
     } catch {
-      toast.error("Failed to add item");
+      toast.error("Falha ao adicionar item");
     }
   };
 
@@ -184,10 +184,10 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
         galleryId,
         itemId: deleteTarget.id,
       });
-      toast.success("Item removed from gallery");
+      toast.success("Item removido da galeria");
       setDeleteTarget(null);
     } catch {
-      toast.error("Failed to remove item");
+      toast.error("Falha ao remover item");
     }
   };
 
@@ -207,7 +207,7 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
   if (!gallery) {
     return (
       <div className="py-8 text-center text-muted-foreground">
-        Gallery not found
+        Galeria nao encontrada
       </div>
     );
   }
@@ -225,20 +225,20 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
         </div>
         <Button onClick={() => setShowPicker(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Items
+          Adicionar Itens
         </Button>
       </div>
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <ImageIcon className="mb-3 h-12 w-12" />
-          <p className="text-sm">This gallery is empty</p>
+          <p className="text-sm">Esta galeria esta vazia</p>
           <Button
             variant="outline"
             className="mt-4"
             onClick={() => setShowPicker(true)}
           >
-            Add your first item
+            Adicionar primeiro item
           </Button>
         </div>
       ) : (
@@ -269,7 +269,7 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
         onOpenChange={setShowPicker}
         onSelect={handleAddItem}
         accept={gallery.type === "image" ? "image/*" : undefined}
-        title="Add media to gallery"
+        title="Adicionar midia a galeria"
       />
 
       <Dialog
@@ -278,22 +278,22 @@ export function GalleryItemsManager({ galleryId }: GalleryItemsManagerProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove item</DialogTitle>
+            <DialogTitle>Remover item</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove this item from the gallery? The
-              original file will not be deleted.
+              Tem certeza que deseja remover este item da galeria? O arquivo
+              original nao sera excluido.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Cancel
+              Cancelar
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteItem}
               disabled={deleteItemMutation.isPending}
             >
-              {deleteItemMutation.isPending ? "Removing..." : "Remove"}
+              {deleteItemMutation.isPending ? "Removendo..." : "Remover"}
             </Button>
           </DialogFooter>
         </DialogContent>

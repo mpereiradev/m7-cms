@@ -7,9 +7,11 @@ import { EMAIL_SERVICE } from '../application/use-cases/invite-user.use-case.js'
 
 // Application — use-cases
 import { ListTenantUsersUseCase } from '../application/use-cases/list-tenant-users.use-case.js';
+import { ListAllUsersUseCase } from '../application/use-cases/list-all-users.use-case.js';
 import { InviteUserUseCase } from '../application/use-cases/invite-user.use-case.js';
 import { UpdateUserRoleUseCase } from '../application/use-cases/update-user-role.use-case.js';
 import { RemoveUserUseCase } from '../application/use-cases/remove-user.use-case.js';
+import { CreateUserDirectUseCase } from '../application/use-cases/create-user-direct.use-case.js';
 
 // Infrastructure
 import { DrizzleUserRepository } from './repositories/drizzle-user.repository.js';
@@ -33,9 +35,11 @@ import { MeController } from './controllers/me.controller.js';
 
     // Use-cases
     ListTenantUsersUseCase,
+    ListAllUsersUseCase,
     InviteUserUseCase,
     UpdateUserRoleUseCase,
     RemoveUserUseCase,
+    CreateUserDirectUseCase,
   ],
   exports: [USER_REPOSITORY],
 })

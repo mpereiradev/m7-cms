@@ -9,7 +9,7 @@ import { VideoForm } from "@/components/videos/video-form";
 
 export default function NewVideoPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Carregando...</div>}>
       <NewVideoContent />
     </Suspense>
   );
@@ -24,10 +24,10 @@ function NewVideoContent() {
     return (
       <div className="space-y-6">
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-destructive">
-          Gallery ID is required. Please navigate from a video gallery.
+          ID da galeria e obrigatorio. Navegue a partir de uma galeria de videos.
         </div>
         <Button variant="outline" asChild>
-          <Link href="/galleries/videos">Back to video galleries</Link>
+          <Link href="/galleries/videos">Voltar para galerias de videos</Link>
         </Button>
       </div>
     );
@@ -38,7 +38,7 @@ function NewVideoContent() {
       <Button variant="ghost" size="sm" asChild>
         <Link href={`/galleries/videos/${galleryId}`}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to gallery
+          Voltar para galeria
         </Link>
       </Button>
       <VideoForm

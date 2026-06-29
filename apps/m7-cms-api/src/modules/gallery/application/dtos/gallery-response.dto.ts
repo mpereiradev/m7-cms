@@ -6,6 +6,10 @@ export class GalleryResponseDto {
   id!: string;
   tenantId!: string;
   slug!: string;
+  title!: string;
+  type!: string;
+  itemCount!: number;
+  coverUrl!: string | null;
   createdAt!: string;
   updatedAt!: string;
 
@@ -14,6 +18,10 @@ export class GalleryResponseDto {
     dto.id = entity.id;
     dto.tenantId = entity.tenantId;
     dto.slug = entity.slug;
+    dto.title = entity.title ?? entity.slug;
+    dto.type = entity.type ?? 'image';
+    dto.itemCount = 0;
+    dto.coverUrl = null;
     dto.createdAt = entity.createdAt.toISOString();
     dto.updatedAt = entity.updatedAt.toISOString();
     return dto;

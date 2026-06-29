@@ -18,7 +18,7 @@ export default function ImageGalleryDetailPage({
       <Button variant="ghost" size="sm" asChild>
         <Link href="/galleries/images">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to galleries
+          Voltar para galerias
         </Link>
       </Button>
       <GalleryItemsManager galleryId={id} />

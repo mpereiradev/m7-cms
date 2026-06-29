@@ -57,6 +57,8 @@ export class GalleriesController {
     const gallery = await this.createGalleryUseCase.execute({
       tenantId: user.tenantId,
       slug: dto.slug,
+      title: dto.title,
+      type: dto.type,
     });
     return { data: GalleryResponseDto.fromEntity(gallery) };
   }

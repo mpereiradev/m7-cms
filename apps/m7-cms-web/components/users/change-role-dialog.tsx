@@ -80,7 +80,7 @@ export function ChangeRoleDialog({
         <DialogHeader>
           <DialogTitle>Alterar Papel</DialogTitle>
           <DialogDescription>
-            Alterar o papel de {user?.fullName || user?.email}.
+            Alterar o papel de {user?.name || user?.email}.
           </DialogDescription>
         </DialogHeader>
 

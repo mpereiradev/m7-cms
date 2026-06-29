@@ -1,12 +1,14 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { db } from '../../../../infrastructure/database/db.js';
 import {
   tenantUsers,
+  tenants,
   users,
 } from '../../../../infrastructure/database/schema/index.js';
 import type { IUserRepository } from '../../application/ports/i-user-repository.port.js';
 import { TenantUserEntity } from '../../domain/entities/tenant-user.entity.js';
+import { UserGlobalEntity } from '../../domain/entities/user-global.entity.js';
 
 @Injectable()
 export class DrizzleUserRepository implements IUserRepository {
@@ -52,10 +54,7 @@ export class DrizzleUserRepository implements IUserRepository {
       .from(tenantUsers)
       .innerJoin(users, eq(tenantUsers.userId, users.id))
       .where(
-        and(
-          eq(tenantUsers.tenantId, tenantId),
-          eq(tenantUsers.userId, userId),
-        ),
+        and(eq(tenantUsers.tenantId, tenantId), eq(tenantUsers.userId, userId)),
       )
       .limit(1);
 
@@ -135,10 +134,7 @@ export class DrizzleUserRepository implements IUserRepository {
       .update(tenantUsers)
       .set({ role: role as any, updatedAt: new Date() })
       .where(
-        and(
-          eq(tenantUsers.tenantId, tenantId),
-          eq(tenantUsers.userId, userId),
-        ),
+        and(eq(tenantUsers.tenantId, tenantId), eq(tenantUsers.userId, userId)),
       )
       .returning();
 
@@ -159,17 +155,168 @@ export class DrizzleUserRepository implements IUserRepository {
     return this.toEntity(tuRows[0], userRows[0]);
   }
 
+  async createUserWithId(data: {
+    id: string;
+    email: string;
+    name: string;
+    tenantId: string;
+    role: string;
+  }): Promise<TenantUserEntity> {
+    // Upsert user record using the Supabase Auth UUID
+    let userRows = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, data.id))
+      .limit(1);
+
+    let user: typeof users.$inferSelect;
+
+    if (userRows.length > 0) {
+      user = userRows[0];
+    } else {
+      const inserted = await db
+        .insert(users)
+        .values({ id: data.id, email: data.email, name: data.name })
+        .returning();
+      user = inserted[0];
+    }
+
+    // Check for duplicate association
+    const existing = await db
+      .select()
+      .from(tenantUsers)
+      .where(
+        and(
+          eq(tenantUsers.tenantId, data.tenantId),
+          eq(tenantUsers.userId, user.id),
+        ),
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      throw new ConflictException(
+        `Usuario "${data.email}" ja pertence a este tenant.`,
+      );
+    }
+
+    const tuRows = await db
+      .insert(tenantUsers)
+      .values({
+        tenantId: data.tenantId,
+        userId: user.id,
+        role: data.role as any,
+      })
+      .returning();
+
+    return this.toEntity(tuRows[0], user);
+  }
+
   async remove(tenantId: string, userId: string): Promise<boolean> {
     const deleted = await db
       .delete(tenantUsers)
       .where(
-        and(
-          eq(tenantUsers.tenantId, tenantId),
-          eq(tenantUsers.userId, userId),
-        ),
+        and(eq(tenantUsers.tenantId, tenantId), eq(tenantUsers.userId, userId)),
       )
       .returning();
 
     return deleted.length > 0;
+  }
+
+  async findSuperAdminUserIds(): Promise<string[]> {
+    const rows = await db
+      .select({ userId: tenantUsers.userId })
+      .from(tenantUsers)
+      .where(eq(tenantUsers.role, 'super_admin'));
+
+    const unique = [...new Set(rows.map((r) => r.userId))];
+    return unique;
+  }
+
+  async findAllUsersWithTenants(): Promise<UserGlobalEntity[]> {
+    const rows = await db
+      .select({
+        userId: users.id,
+        email: users.email,
+        name: users.name,
+        photoUrl: users.photoUrl,
+        tenantId: tenantUsers.tenantId,
+        tenantName: tenants.name,
+        tenantSlug: tenants.slug,
+        role: tenantUsers.role,
+      })
+      .from(users)
+      .leftJoin(tenantUsers, eq(tenantUsers.userId, users.id))
+      .leftJoin(tenants, eq(tenants.id, tenantUsers.tenantId))
+      .orderBy(users.name);
+
+    const map = new Map<
+      string,
+      {
+        userId: string;
+        email: string;
+        name: string;
+        photoUrl: string | null;
+        tenants: {
+          tenantId: string;
+          tenantName: string;
+          tenantSlug: string;
+          role: string;
+        }[];
+      }
+    >();
+
+    for (const row of rows) {
+      if (!map.has(row.userId)) {
+        map.set(row.userId, {
+          userId: row.userId,
+          email: row.email,
+          name: row.name,
+          photoUrl: row.photoUrl,
+          tenants: [],
+        });
+      }
+      if (row.tenantId && row.tenantName && row.tenantSlug && row.role) {
+        map.get(row.userId)!.tenants.push({
+          tenantId: row.tenantId,
+          tenantName: row.tenantName,
+          tenantSlug: row.tenantSlug,
+          role: row.role,
+        });
+      }
+    }
+
+    return Array.from(map.values()).map((u) => new UserGlobalEntity(u));
+  }
+
+  async linkUsersToTenant(
+    tenantId: string,
+    userIds: string[],
+    role: string,
+  ): Promise<void> {
+    if (userIds.length === 0) return;
+
+    // Find which users are already linked to avoid duplicates
+    const existing = await db
+      .select({ userId: tenantUsers.userId })
+      .from(tenantUsers)
+      .where(
+        and(
+          eq(tenantUsers.tenantId, tenantId),
+          inArray(tenantUsers.userId, userIds),
+        ),
+      );
+
+    const alreadyLinked = new Set(existing.map((r) => r.userId));
+    const toInsert = userIds.filter((id) => !alreadyLinked.has(id));
+
+    if (toInsert.length === 0) return;
+
+    await db.insert(tenantUsers).values(
+      toInsert.map((userId) => ({
+        tenantId,
+        userId,
+        role: role as any,
+      })),
+    );
   }
 }
